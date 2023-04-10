@@ -1,6 +1,7 @@
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
 import pymysql.cursors
+import hashlib, time
 
 #for uploading photo:
 from app import app
@@ -65,22 +66,30 @@ def register():
 def loginAuth():
     #grabs information from the forms
     username = request.form['username']
-    password = request.form['password']
+    plaintextPasword = request.form['password']
+
+    ## need to change varchar limit in order for this to work
+    hashedPassword = hashlib.sha256(plaintextPasword.encode("utf-8")).hexdigest()
+
+    lastlogin = time.strftime('%Y-%m-%d')
 
     #cursor used to send queries
     cursor = conn.cursor()
     #executes query
     query = 'SELECT * FROM user WHERE username = %s and pwd = %s'
-    cursor.execute(query, (username, password))
+    cursor.execute(query, (username, plaintextPasword))
     #stores the results in a variable
     data = cursor.fetchone()
     #use fetchall() if you are expecting more than 1 data row
-    cursor.close()
     error = None
     if(data):
         #creates a session for the the user
         #session is a built in
         session['username'] = username
+        update = 'UPDATE user SET lastlogin = %s WHERE username = %s'
+        cursor.execute(update, (lastlogin, username))
+        conn.commit()
+        cursor.close()
         return redirect(url_for('home'))
     else:
         #returns an error message to the html page
@@ -92,7 +101,13 @@ def loginAuth():
 def registerAuth():
     #grabs information from the forms
     username = request.form['username']
-    password = request.form['password']
+    plaintextPasword = request.form['password']
+
+    ## need to change varchar limit in order for this to work
+    hashedPassword = hashlib.sha256(plaintextPasword.encode("utf-8")).hexdigest()
+    fname = request.form['First Name']
+    lname = request.form['Last Name']
+    nickname = request.form['nickname']
 
     #cursor used to send queries
     cursor = conn.cursor()
@@ -108,8 +123,8 @@ def registerAuth():
         error = "This user already exists"
         return render_template('register.html', error = error)
     else:
-        ins = 'INSERT INTO user VALUES(%s, %s)'
-        cursor.execute(ins, (username, password))
+        ins = 'INSERT INTO user VALUES(%s, %s, %s, %s, %s, %s)'
+        cursor.execute(ins, (username, plaintextPasword, fname, lname, time.strftime('%Y-%m-%d %H:%M:%S'), nickname))
         conn.commit()
         cursor.close()
         return render_template('index.html')
