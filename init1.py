@@ -136,11 +136,30 @@ def home():
     cursor = conn.cursor()
     # query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
     # cursor.execute(query, (user))
-    print("we're here")
     # data = cursor.fetchall()
     cursor.close()
     return render_template('home.html', username=user)
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == "POST":
+        print("in post method")
+        song = request.form['song']
+        
+        # search by author or book
+        cursor = conn.cursor()
+        cursor.execute("SELECT title, releaseDate, songURL from song where title like %s ", (song))
+        conn.commit()
+        data = cursor.fetchall()
+        print(data)
+        # all in the search box will return all the tuples
+        if len(data) == 0 and song == 'all': 
+            cursor.execute("SELECT title, releaseDate, songURL from song")
+            conn.commit()
+            data = cursor.fetchall()
+            print(data)
+        return render_template('search.html', data=data)
+    return render_template('search.html')
         
 # @app.route('/post', methods=['GET', 'POST'])
 # def post():

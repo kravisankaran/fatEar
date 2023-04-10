@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-  
+        scale=1">
+        <link rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-
+        awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/static/search.css">
+    </head>
+    <body>
+        <h1><center>FatEar</center></h1>
+        <form class="example" method="post" action="" 
+         style="margin:auto;max-width:600px">
+            <input type="text" placeholder="Search by song, or 
+             album, or all to see all the data" name="song">
+            <button type="submit"><i class="fa fa-search"></i>
+            </button>
+        </form>
+        <p></p>
+        <center>
+        {% for item in data %}
+            <tr>
+                <td> {{item.title}} released on {{item.releaseDate}}</td>
+                </br>
+            </tr>
+        {% endfor %}
+        </center>
+    </body>
+</html>
