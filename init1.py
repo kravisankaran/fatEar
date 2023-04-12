@@ -286,16 +286,25 @@ def search():
 
 @login_required
 def fetchFriendRequests():
-  with conn.cursor() as cursor:
-    query = "SELECT user2 FROM friend WHERE user1 = '%s' AND acceptStatus = 'pending'" % session["username"]
-    cursor.execute(query)
+  cursor = conn.cursor()
+  query = "SELECT user2 FROM friend WHERE user1 = '%s' AND acceptStatus = 'pending'" % session["username"]
+  cursor.execute(query)
+  return cursor.fetchall()
+
+@login_required
+def fetchFriends():
+  cursor = conn.cursor()
+  user = session["username"]
+  query = "SELECT user1 as myFriend FROM friend WHERE user2=%s AND acceptStatus = 'accepted' UNION SELECT user2 as myFriend FROM friend WHERE user1=%s AND acceptStatus = 'accepted'"
+  cursor.execute(query, (user, user))
   return cursor.fetchall()
 
 @app.route("/friend", methods=["GET"])
 @login_required
 def friend():
-  data = fetchFriendRequests()
-  return render_template("friend.html", friendRequests=data)
+  request_data = fetchFriendRequests()
+  allf_data = fetchFriends()
+  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data)
 
 # does not handle duplicated requests yet!
 @app.route("/friendUsername", methods=["POST"])
@@ -306,10 +315,11 @@ def friendUsername():
     username_friended = requestData["username_friended"]
     username_requester = session["username"]
     if checkUserExist(username_friended):
-      data = fetchFriendRequests()
+      request_data = fetchFriendRequests()
+      allf_data = fetchFriends()
       if username_friended == username_requester:
         message = "You cannot friend yourself!"
-        return render_template("friend.html", message=message)
+        return render_template("friend.html", message=message, friendRequests=request_data, allFriends = allf_data)
       try:
         acceptStatus = 'pending'
         cursor = conn.cursor()
@@ -324,7 +334,7 @@ def friendUsername():
         return render_template("friend.html", message=message)
     else:
       message = "%s does not exist." % (username_friended)
-  return render_template("friend.html", friendRequests=data, message=message)
+  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data, message=message)
 
 @login_required
 @app.route("/accept/<username>", methods=["POST"])
@@ -337,8 +347,9 @@ def accept(username):
   conn.commit()
   cursor.close()
 
-  data = fetchFriendRequests()
-  return render_template("friend.html", friendRequests=data)
+  request_data = fetchFriendRequests()
+  allf_data = fetchFriends()
+  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data)
 
 
 @login_required
@@ -352,13 +363,17 @@ def decline(username):
   conn.commit()
   cursor.close()
 
-  data = fetchFriendRequests()
-  return render_template("friend.html", friendRequests=data)
+  request_data = fetchFriendRequests()
+  allf_data = fetchFriends()
+  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data)
 
 
 # does not check if users are actually friends 
 @app.route("/unfriend", methods=["POST"])
 def unfriend():
+  request_data = fetchFriendRequests()
+  allf_data = fetchFriends()
+
   if request.form:
     requestData = request.form
     to_unfriend = requestData["to_unfriend"]
@@ -367,21 +382,22 @@ def unfriend():
     if checkUserExist(to_unfriend):
       if to_unfriend == currentUser:
         message = "You cannot unfriend yourself!"
-        return render_template("friend.html", unfriend_message=message, username=session["username"])
+        return render_template("friend.html", unfriend_message=message, username=session["username"],friendRequests=request_data, allFriends = allf_data)
       try:
         cursor1 = conn.cursor()
         query = "DELETE FROM friend WHERE (user1=%s AND user2=%s) OR (user2=%s AND user1=%s) AND acceptStatus = 'accepted'"
         cursor1.execute(query, (to_unfriend, currentUser, to_unfriend, currentUser))
         conn.commit()
         cursor1.close()
-        message = "Successfully removed friend " + to_unfriend
+
+        #doesn't instantly update, have to refresh 
+        message = "Successfully removed friend, refresh to see current friend list" + to_unfriend
       except:
         message = "Failed to unfriend " + to_unfriend
     else:
       message = "user %s does not exist" % (to_unfriend)
-      return render_template("friend.html", unfriend_message=message, username=session["username"])
-  return render_template("friend.html", unfriend_message=message, username=session["username"])
-
+      return render_template("friend.html", unfriend_message=message, username=session["username"],friendRequests=request_data, allFriends = allf_data)
+  return render_template("friend.html", unfriend_message=message, username=session["username"],friendRequests=request_data, allFriends = allf_data)
 
 
 

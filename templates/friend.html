@@ -51,12 +51,14 @@
         {% endif %}
       </div>
 
-      
-      
-      <h3>All Friends: </h3>
-    
-      <br>
 
+      <br>
+      <h3>Friend List: </h3>
+        {% for f in allFriends %}
+        <ul>
+            <li> {{ f.myFriend }} </li>
+        </ul>
+        {% endfor %}
 
     </div>
   </body>
