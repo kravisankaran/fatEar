@@ -145,22 +145,58 @@ def search():
     if request.method == "POST":
         print("in post method")
         song = request.form['song']
-        
+        artistFName = request.form['artistFName']
+        artistLName = request.form['artistLName']
+        album = request.form['album']
+        print(song)
+        print(artistFName)
+        print(artistLName)
+        print(album)
         # search by author or book
         cursor = conn.cursor()
-        cursor.execute("SELECT title, releaseDate, songURL from song where title like %s ", (song))
+        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where title like %s or a.fname like %s and a.lname like %s ", (song, artistFName, artistLName))
         conn.commit()
         data = cursor.fetchall()
         print(data)
-        # all in the search box will return all the tuples
-        if len(data) == 0 and song == 'all': 
-            cursor.execute("SELECT title, releaseDate, songURL from song")
-            conn.commit()
-            data = cursor.fetchall()
-            print(data)
+    
+        # if len(data) == 0:
+        if song is None or song == "": 
+                print("Artist FName ", artistFName)
+                print("Artist LName ", artistLName)
+                if artistFName != "" :
+                    if artistLName != "":
+                        print("tries to match using first name and last name")
+                        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where a.fname like %s and a.lname like %s ", (artistFName, artistLName))
+                        conn.commit()
+                        data = cursor.fetchall()
+                    if artistLName == "":
+                        print("tries to match first name only")
+                        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where a.fname like %s ", (artistFName))
+                        conn.commit()
+                        data = cursor.fetchall()       
+                if artistFName == "":
+                    if artistLName != "":
+                        print("tries to match lastname only")
+                        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where a.lname like %s ", (artistLName))
+                        conn.commit()
+                        data = cursor.fetchall()
+        if song != "" :
+            print("Entered else")
+            if song == 'all':
+                print("all was chosen")
+                cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID")
+                conn.commit()
+                data = cursor.fetchall()
+                print(data)
+            
         return render_template('search.html', data=data)
-    return render_template('search.html')
         
+        
+
+    return render_template('search.html')
+
+
+
 # @app.route('/post', methods=['GET', 'POST'])
 # def post():
 #     username = session['username']
