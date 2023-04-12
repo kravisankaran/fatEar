@@ -1,5 +1,6 @@
 #Import Flask Library
 from flask import Flask, render_template, request, session, url_for, redirect, flash
+from functools import wraps
 import pymysql.cursors
 import hashlib, time
 
@@ -24,6 +25,20 @@ conn = pymysql.connect(host='localhost',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
+def login_required(f):
+  @wraps(f)
+  def dec(*args, **kwargs):
+    if not "username" in session:
+      return redirect(url_for("login"))
+    return f(*args, **kwargs)
+  return dec
+
+def checkUserExist(username):
+  with conn.cursor() as cursor:
+    query = "SELECT * FROM user WHERE username = '%s'" % (username)
+    cursor.execute(query)
+  result = cursor.fetchall()
+  return result
 
 # def allowed_image(filename):
 
@@ -129,6 +144,11 @@ def registerAuth():
         cursor.close()
         return render_template('index.html')
 
+
+@app.route('/logout')
+def logout():
+    session.pop('username')
+    return redirect('/')
 
 @app.route('/home')
 def home():
@@ -260,10 +280,111 @@ def search():
 # 			return redirect(request.url)
 
 
-@app.route('/logout')
-def logout():
-    session.pop('username')
-    return redirect('/')
+
+
+#friend 
+
+@login_required
+def fetchFriendRequests():
+  with conn.cursor() as cursor:
+    query = "SELECT user2 FROM friend WHERE user1 = '%s' AND acceptStatus = 'pending'" % session["username"]
+    cursor.execute(query)
+  return cursor.fetchall()
+
+@app.route("/friend", methods=["GET"])
+@login_required
+def friend():
+  data = fetchFriendRequests()
+  return render_template("friend.html", friendRequests=data)
+
+# does not handle duplicated requests yet!
+@app.route("/friendUsername", methods=["POST"])
+@login_required
+def friendUsername():
+  if request.form:
+    requestData = request.form
+    username_friended = requestData["username_friended"]
+    username_requester = session["username"]
+    if checkUserExist(username_friended):
+      data = fetchFriendRequests()
+      if username_friended == username_requester:
+        message = "You cannot friend yourself!"
+        return render_template("friend.html", message=message)
+      try:
+        acceptStatus = 'pending'
+        cursor = conn.cursor()
+        query = "INSERT INTO friend VALUES (%s, %s, %s, %s, %s, %s)"
+        cursor.execute(query, (username_friended, username_requester, acceptStatus, username_requester,
+                        time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S')))
+        conn.commit()
+        cursor.close()
+        message = "Request sent to %s." % (username_friended)
+      except:
+        message = "An error has occurred. Please try again."
+        return render_template("friend.html", message=message)
+    else:
+      message = "%s does not exist." % (username_friended)
+  return render_template("friend.html", friendRequests=data, message=message)
+
+@login_required
+@app.route("/accept/<username>", methods=["POST"])
+def accept(username):
+  username_friended = session["username"]
+  username_requester = username
+  cursor = conn.cursor()
+  query = "UPDATE friend SET acceptStatus = 'accepted', updatedAt = %s WHERE user1 = %s AND user2 = %s"
+  cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'),username_friended, username_requester))
+  conn.commit()
+  cursor.close()
+
+  data = fetchFriendRequests()
+  return render_template("friend.html", friendRequests=data)
+
+
+@login_required
+@app.route("/decline/<username>", methods=["POST"])
+def decline(username):
+  username_friended = session["username"]
+  username_requester = username
+  cursor = conn.cursor()
+  query = "DELETE FROM friend WHERE user1 = %s AND user2 = %s"
+  cursor.execute(query, (username_friended, username_requester))
+  conn.commit()
+  cursor.close()
+
+  data = fetchFriendRequests()
+  return render_template("friend.html", friendRequests=data)
+
+
+# does not check if users are actually friends 
+@app.route("/unfriend", methods=["POST"])
+def unfriend():
+  if request.form:
+    requestData = request.form
+    to_unfriend = requestData["to_unfriend"]
+    currentUser = session["username"]
+
+    if checkUserExist(to_unfriend):
+      if to_unfriend == currentUser:
+        message = "You cannot unfriend yourself!"
+        return render_template("friend.html", unfriend_message=message, username=session["username"])
+      try:
+        cursor1 = conn.cursor()
+        query = "DELETE FROM friend WHERE (user1=%s AND user2=%s) OR (user2=%s AND user1=%s) AND acceptStatus = 'accepted'"
+        cursor1.execute(query, (to_unfriend, currentUser, to_unfriend, currentUser))
+        conn.commit()
+        cursor1.close()
+        message = "Successfully removed friend " + to_unfriend
+      except:
+        message = "Failed to unfriend " + to_unfriend
+    else:
+      message = "user %s does not exist" % (to_unfriend)
+      return render_template("friend.html", unfriend_message=message, username=session["username"])
+  return render_template("friend.html", unfriend_message=message, username=session["username"])
+
+
+
+
         
 app.secret_key = 'some key that you will never guess'
 #Run the app on localhost port 5000

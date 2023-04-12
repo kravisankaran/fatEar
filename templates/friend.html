@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <title>FatEar</title>
+  </head>
+  <body>
+    <a href="/home">Back to Home</a>
+    <br>
+
+    <h1>Manage Friends</h1>
+    <div>
+      <div>
+        <h2>Find a Friend:</h2>
+        <form action="/friendUsername" method="post">
+          <input type="text" name="username_friended" placeholder="Username to friend" required/>
+          <input type="submit" value="Friend">
+        </form>
+        {% if message %}
+          {{ message }}
+        {% endif %}
+      </div>
+
+      <div>
+        <h2>Manage Friend Requests</h2>
+        {% if friendRequests %}
+          <ul>
+            {% for request in friendRequests %}
+              <li>
+                <h3>{{ request.user2 }} has requested to follow you. </h3>
+                <form action="/accept/{{request.user2}}" method="POST">
+                  <input type="submit" value="Accept">
+                </form>
+                <form action="/decline/{{request.user2}}" method="POST">
+                  <input type="submit" value="Decline">
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <span>Currently, you don't have any friend requests.</span>
+        {% endif %}
+      </div>
+
+      <div>
+      <form action="/unfriend" method="post">
+          <h2>Enter username to unfriend:</h2>
+          <input type="text" name="to_unfriend" placeholder="Username to unfriend" required/>
+          <input type="submit" value="Unfriend">
+      </form>
+        {% if unfriend_message %}
+          {{ unfriend_message }}
+        {% endif %}
+      </div>
+
+      
+      
+      <h3>All Friends: </h3>
+    
+      <br>
+
+
+    </div>
+  </body>
+</html>
