@@ -160,6 +160,43 @@ def home():
     cursor.close()
     return render_template('home.html', username=user)
 
+def _checkEmptyParams(x):
+   if x == "":
+      return 0
+   else:
+      return 1
+   
+def getSearchQuery(x, song, fname, lname):
+    if x['s'] and x['f'] and x['l'] :
+        print ('all 3 are present')
+        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.fname like %s and a.lname like %s", (song,fname,lname)
+    elif x['s'] and x['f'] :
+        print('song and artist fname present')
+        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.fname like %s", (song,fname)
+
+    elif x['s'] and x['l']:
+        print ('song and artist lname present')
+        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.lname like %s", (song,lname)
+
+    elif x['f'] and x['l']:
+        print('artist fname and lname present')
+        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.fname like %s and a.lname like %s", (fname, lname)
+
+    elif x['f']:
+        print ('only firstname')
+        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.fname like %s", (fname)
+
+    elif x['l']:
+        print ('only lastname')
+        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.lname like %s", (lname)
+
+    elif x['s']:
+        print ('only song')
+        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s", (song)
+
+    else:
+       print('nothing was picked')
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == "POST":
@@ -172,43 +209,24 @@ def search():
         print(artistFName)
         print(artistLName)
         print(album)
-        # search by author or book
+       
         cursor = conn.cursor()
-        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where title like %s or a.fname like %s and a.lname like %s ", (song, artistFName, artistLName))
+        # song, artistF, artistLast, album
+        searchParams = [song, artistFName, artistLName]
+        keys = ["s", "f", "l"]
+        
+        status = list(map(_checkEmptyParams, searchParams))
+        parameterMap = {keys[i]: status[i] for i in range(len(keys))}
+        print(parameterMap)
+        
+        song2 = "%" + song + "%"
+        artistFName2 = "%" + artistFName + "%"
+        artistLName2 = "%" + artistLName + "%"
+        query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2)
+        print(query)
+        cursor.execute(query[0], query[1])
         conn.commit()
         data = cursor.fetchall()
-        print(data)
-    
-        # if len(data) == 0:
-        if song is None or song == "": 
-                print("Artist FName ", artistFName)
-                print("Artist LName ", artistLName)
-                if artistFName != "" :
-                    if artistLName != "":
-                        print("tries to match using first name and last name")
-                        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where a.fname like %s and a.lname like %s ", (artistFName, artistLName))
-                        conn.commit()
-                        data = cursor.fetchall()
-                    if artistLName == "":
-                        print("tries to match first name only")
-                        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where a.fname like %s ", (artistFName))
-                        conn.commit()
-                        data = cursor.fetchall()       
-                if artistFName == "":
-                    if artistLName != "":
-                        print("tries to match lastname only")
-                        cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID where a.lname like %s ", (artistLName))
-                        conn.commit()
-                        data = cursor.fetchall()
-        if song != "" :
-            print("Entered else")
-            if song == 'all':
-                print("all was chosen")
-                cursor.execute("select s.title, a.fname, a.lname, s.releaseDate from song s join artistPerformsSong asp on s.songID = asp.songID join artist a on a.artistID = asp.artistID")
-                conn.commit()
-                data = cursor.fetchall()
-                print(data)
-            
         return render_template('search.html', data=data)
         
         
