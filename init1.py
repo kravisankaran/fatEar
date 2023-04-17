@@ -400,6 +400,16 @@ def unfriend():
   return render_template("friend.html", unfriend_message=message, username=session["username"],friendRequests=request_data, allFriends = allf_data)
 
 
+@login_required
+@app.route("/post", methods=["GET"])
+def fetchList():
+  cursor = conn.cursor()
+  query = " SELECT s.songID,s.title, sIA.albumId, a.artistID, a.fname, a.lname FROM song s JOIN artistPerformsSong aPS on s.songID = aPS.songID JOIN artist a on a.artistID = aPS.artistID JOIN songInAlbum sIA on s.songID = sIA.songID;"
+  cursor.execute(query)
+  list = cursor.fetchall()
+  cursor.close()
+  return render_template("post.html", list=list)
+
 
         
 app.secret_key = 'some key that you will never guess'

@@ -4,8 +4,8 @@
 <body>
 <form action="/post" method="POST">
 	<h1> Welcome {{username}}</h1> 
-	<input type="text" name = "blog" placeholder="post" required/> </br>
-	<input type="submit" value = Post />
+{#	<input type="text" name = "blog" placeholder="post" required/> </br>#}
+{#	<input type="submit" value = Post />#}
 </form>
 
 <style type="text/css">
@@ -20,12 +20,12 @@
 	<th>Time</th>
 	<th>Post</th>
 
-{% for line in posts %}
-	<tr>
-		<td>{{line.ts}}</td>
-		<td>{{line.blog_post}}</td>
-	</tr>
-{% endfor %}
+{#{% for line in posts %}#}
+{#	<tr>#}
+{#		<td>{{line.ts}}</td>#}
+{#		<td>{{line.blog_post}}</td>#}
+{#	</tr>#}
+{#{% endfor %}#}
 </table> -->
 
 <!-- <a href="/select_blogger">Select a blogger</a>
@@ -33,9 +33,11 @@
 <a href="/upload_form">Upload a photo</a>
 <br> -->
 
+
 <div>
 	<ul>
 		<li><a href="/friend">Manage Friends</a></li>
+        <li><a href="/post">Post rate and review</a></li>
 		<li><a href="/logout">Logout</a></li>
 	</ul>
 </div>

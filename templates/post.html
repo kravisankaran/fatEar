@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post</title>
+</head>
+<body>
+   <div>
+        <h2>List</h2>
+        {% if list %}
+          <ul>
+            {% for l in list %}
+              <li>
+                <div>{{ l }} </div>
+
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <span>No song list</span>
+        {% endif %}
+      </div>
+</body>
+</html>
