@@ -427,6 +427,8 @@ def unfriend():
 @login_required
 @app.route("/post", methods=["GET"])
 def fetchList():
+    # Fetch all data from song, album, artist tables
+    user_id = session['username']
     cursor = conn.cursor()
     query = " SELECT s.songID,s.title, sIA.albumID, a.artistID, a.fname, a.lname FROM song s JOIN artistPerformsSong aPS on s.songID = aPS.songID JOIN artist a on a.artistID = aPS.artistID JOIN songInAlbum sIA on s.songID = sIA.songID;"
     cursor.execute(query)
@@ -445,8 +447,12 @@ def fetchList():
     error_duplicate_album_rating = request.args.get('error_duplicate_album_rating')
     error_empty_album_rating = request.args.get('error_empty_album_rating')
 
+    # Fetch all data from review, rate, fan tables
+    review_album_data, review_song_data, rating_album_data, rating_song_data, fan_data = fetchPost()
+
     return render_template("post.html",
                            list=list,
+                           user_id=user_id,
                            error_duplicate_song_review=error_duplicate_song_review,
                            error_empty_song_review=error_empty_song_review,
                            error_duplicate_album_review=error_duplicate_album_review,
@@ -454,7 +460,30 @@ def fetchList():
                            error_duplicate_song_rating=error_duplicate_song_rating,
                            error_empty_song_rating=error_empty_song_rating,
                            error_duplicate_album_rating=error_duplicate_album_rating,
-                           error_empty_album_rating=error_empty_album_rating)
+                           error_empty_album_rating=error_empty_album_rating,
+                           review_album_data=review_album_data,
+                           review_song_data=review_song_data,
+                           rating_album_data=rating_album_data,
+                           rating_song_data=rating_song_data,
+                           fan_data=fan_data
+                           )
+
+
+def fetchPost():
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM reviewAlbum")
+    review_album_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM reviewSong")
+    review_song_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM rateAlbum")
+    rating_album_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM rateSong")
+    rating_song_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM userFanOfArtist")
+    fan_data = cursor.fetchall()
+
+    cursor.close()
+    return review_album_data, review_song_data, rating_album_data, rating_song_data, fan_data
 
 
 @login_required

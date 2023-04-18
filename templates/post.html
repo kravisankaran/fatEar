@@ -19,7 +19,7 @@
 <body>
 <div class="container">
     <h2>List</h2>
-
+    <h3>username: {{ user_id }}</h3>
     {% if list %}
         <ul style="list-style-type: none;">
             {% for data in list %}
@@ -131,30 +131,60 @@
                             </div>
                         </div>
                         <!-- SONG -->
-                        <div class="card">
+                        <div class="card" style="width: 100%;">
                             <div class="card-body">
                                 <h5 class="card-title">SONG</h5>
                                 <h6 class="card-subtitle mb-2 text-body-secondary">{{ data.title }}</h6>
-                                <div class="card-text">Some quick example text to build on the card title and make up
-                                    the
-                                    bulk
-                                    of the card's
-                                    content.
+                                <div class="card-text">
+                                    <h5 style="margin-top: 1rem">Review</h5>
+                                    <ul class="list-group">
+                                        {% for review in review_song_data %}
+                                            {% if review.songID == data.songID %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ review.username }}:</strong> {{ review.reviewText }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                    <h5 style="margin-top: 1rem">Rating</h5>
+                                    <ul class="list-group">
+                                        {% for rating in rating_song_data %}
+                                            {% if rating.songID == data.songID %}
+                                                <li class="list-group-item"><strong>{{ rating.username }}:</strong>
+                                                    {{ rating.stars }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
                                 </div>
-
-
                             </div>
                         </div>
                         <!-- ALBUM -->
-                        <div class="card">
+                        <div class="card" style="width: 100%;">
                             <div class="card-body">
                                 <h5 class="card-title">ALBUM</h5>
                                 <h6 class="card-subtitle mb-2 text-body-secondary">{{ data.albumID }}</h6>
-                                <div class="card-text">Some quick example text to build on the card title and make up
-                                    the
-                                    bulk
-                                    of the card's
-                                    content.
+                                <div class="card-text">
+                                    <h5 style="margin-top: 1rem">Review</h5>
+                                    <ul class="list-group">
+                                        {% for review in review_album_data %}
+                                            {% if review.albumID == data.albumID %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ review.username }}:</strong> {{ review.reviewText }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                    <h5 style="margin-top: 1rem">Rating</h5>
+                                    <ul class="list-group">
+                                        {% for rating in rating_album_data %}
+                                            {% if rating.albumID == data.albumID %}
+                                                <li class="list-group-item"><strong>{{ rating.username }}:</strong>
+                                                    {{ rating.stars }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
                                 </div>
 
 
@@ -162,15 +192,22 @@
 
                         </div>
                         <!-- FAN -->
-                        <div class="card">
+                        <div class="card" style="width: 100%;">
                             <div class="card-body">
-                                <h5 class="card-title">FANS of ARTIST</h5>
+                                <h5 class="card-title">List of FANS</h5>
                                 <h6 class="card-subtitle mb-2 text-body-secondary">{{ data.fname }} {{ data.lname }}</h6>
-                                <div class="card-text">Some quick example text to build on the card title and make up
-                                    the
-                                    bulk
-                                    of the card's
-                                    content.
+                                <div class="card-text">
+
+                                    <ul class="list-group" style="margin-top: 1rem">
+                                        {% for fan in fan_data %}
+                                            {% if fan.artistID == data.artistID %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ fan.username }}</strong>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+
                                 </div>
 
 
