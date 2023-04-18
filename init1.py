@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, session, url_for, redirect, f
 from functools import wraps
 import pymysql.cursors
 import hashlib, time
+from datetime import datetime
 
 #for uploading photo:
 from app import app
@@ -40,6 +41,12 @@ def checkUserExist(username):
   result = cursor.fetchall()
   return result
 
+def checkPlaylistExists(username, playlistName):
+    with conn.cursor() as cursor:
+        query = "SELECT * FROM playlist WHERE username = '%s' % (username) and playlistName = '%s' % (playlistName)"
+        cursor.execute(query)
+    result = cursor.fetchall()
+    return result
 # def allowed_image(filename):
 
 #     if not "." in filename:
@@ -204,11 +211,11 @@ def search():
         song = request.form['song']
         artistFName = request.form['artistFName']
         artistLName = request.form['artistLName']
-        album = request.form['album']
+        # album = request.form['album']
         print(song)
         print(artistFName)
         print(artistLName)
-        print(album)
+        # print(album)
        
         cursor = conn.cursor()
         # song, artistF, artistLast, album
@@ -222,6 +229,7 @@ def search():
         song2 = "%" + song + "%"
         artistFName2 = "%" + artistFName + "%"
         artistLName2 = "%" + artistLName + "%"
+        #album = "%" + album + "%"
         query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2)
         print(query)
         cursor.execute(query[0], query[1])
@@ -233,7 +241,35 @@ def search():
 
     return render_template('search.html')
 
+@app.route('/playlist', methods=['GET', 'POST'])
+def addPlaylist():
+    if request.method == "POST":
+        print("in post method")
+        playlistName = request.form['playlist']
+        userName = session['username']
+        description = request.form['description']
+        creationDate = str(datetime.now())
+        song = request.form['song']
+        
+        print(playlistName)
+        print(song)
+        print(userName)
+        print(datetime)
+        ##add alert if user, playlist already exists
+        cursor = conn.cursor()
+        # song, artistF, artistLast, album
+        print("Creating new entry in Playlist Table")
+        cursor.execute("INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)", (userName, playlistName, description, creationDate))
+        cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)", (userName, playlistName, song))
+        conn.commit()
+        cursor.execute("select * from songsInPlaylist")
+        data = cursor.fetchall()
+        print(data)
+        return render_template('playlist.html', data=data)
+        
+        
 
+    return render_template('playlist.html')
 
 # @app.route('/post', methods=['GET', 'POST'])
 # def post():
