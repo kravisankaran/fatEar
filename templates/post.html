@@ -125,7 +125,11 @@
                                         <input type="hidden" name="artist_id" value="{{ data.artistID }}">
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
-
+                                    {% if error_fan and error_artist_id == data.artistID %}
+                                        <p class="error text-danger">
+                                            <strong>Error:</strong> {{ error_fan }}
+                                        </p>
+                                    {% endif %}
                                 </form>
 
                             </div>

@@ -447,6 +447,10 @@ def fetchList():
     error_duplicate_album_rating = request.args.get('error_duplicate_album_rating')
     error_empty_album_rating = request.args.get('error_empty_album_rating')
 
+    # Error -Fan
+    error_fan = request.args.get('error_fan')
+    error_artist_id = request.args.get('error_artist_id')
+
     # Fetch all data from review, rate, fan tables
     review_album_data, review_song_data, rating_album_data, rating_song_data, fan_data = fetchPost()
 
@@ -461,6 +465,8 @@ def fetchList():
                            error_empty_song_rating=error_empty_song_rating,
                            error_duplicate_album_rating=error_duplicate_album_rating,
                            error_empty_album_rating=error_empty_album_rating,
+                           error_fan=error_fan,
+                           error_artist_id=error_artist_id,
                            review_album_data=review_album_data,
                            review_song_data=review_song_data,
                            rating_album_data=rating_album_data,
@@ -615,20 +621,35 @@ def fan_of_artist():
     artist_id = request.form['artist_id']
     is_fan = request.form.get('is_fan', 'off') == 'on'
     user_id = session['username']
+    error_fan = ""
+
+    # Check if user is already a fan
+    check_query = "SELECT * FROM userFanOfArtist WHERE username = %s AND artistID = %s;"
+    cursor.execute(check_query, (user_id, artist_id))
+    result = cursor.fetchone()
 
     if is_fan:
-        # Insert fan relationship in the database
-        save_query = "INSERT INTO userFanOfArtist (username, artistID) VALUES (%s, %s);"
-        cursor.execute(save_query, (user_id, artist_id))
+        # Insert fan relationship in the database only if not already a fan
+        if not result:
+            save_query = "INSERT INTO userFanOfArtist (username, artistID) VALUES (%s, %s);"
+            cursor.execute(save_query, (user_id, artist_id))
+        else:
+            error_fan = "You are already a fan of this artist."
     else:
-        # Remove fan relationship from the database
-        delete_query = "DELETE FROM userFanOfArtist WHERE username = %s AND artistID = %s;"
-        cursor.execute(delete_query, (user_id, artist_id))
+        # Remove fan relationship from the database only if user is a fan
+        if result:
+            delete_query = "DELETE FROM userFanOfArtist WHERE username = %s AND artistID = %s;"
+            cursor.execute(delete_query, (user_id, artist_id))
+        else:
+            error_fan = "You are not a fan of this artist."
 
     conn.commit()
     cursor.close()
 
-    return redirect(url_for('fetchList'))
+    if error_fan:
+        return redirect(url_for('fetchList', error_fan=error_fan, error_artist_id=artist_id))
+    else:
+        return redirect(url_for('fetchList'))
 
 
 app.secret_key = 'some key that you will never guess'
