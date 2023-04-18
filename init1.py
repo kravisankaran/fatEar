@@ -1,45 +1,52 @@
-#Import Flask Library
-from flask import Flask, render_template, request, session, url_for, redirect, flash
-from functools import wraps
-import pymysql.cursors
-import hashlib, time
+# Import Flask Library
+import hashlib
+import time
 from datetime import datetime
+from functools import wraps
 
-#for uploading photo:
+import pymysql.cursors
+
+from flask import render_template, request, session, url_for, redirect
+
+
+# for uploading photo:
 from app import app
-#from flask import Flask, flash, request, redirect, render_template
-from werkzeug.utils import secure_filename
+
+# from flask import Flask, flash, request, redirect, render_template
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-
 
 ###Initialize the app from Flask
 ##app = Flask(__name__)
 ##app.secret_key = "secret key"
 
-#Configure MySQL
+# Configure MySQL
 conn = pymysql.connect(host='localhost',
-                       port = 8889,
+                       port=8889,
                        user='root',
                        password='root',
                        db='FatEar',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
+
 def login_required(f):
-  @wraps(f)
-  def dec(*args, **kwargs):
-    if not "username" in session:
-      return redirect(url_for("login"))
-    return f(*args, **kwargs)
-  return dec
+    @wraps(f)
+    def dec(*args, **kwargs):
+        if not "username" in session:
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+
+    return dec
+
 
 def checkUserExist(username):
-  with conn.cursor() as cursor:
-    query = "SELECT * FROM user WHERE username = '%s'" % (username)
-    cursor.execute(query)
-  result = cursor.fetchall()
-  return result
+    with conn.cursor() as cursor:
+        query = "SELECT * FROM user WHERE username = '%s'" % (username)
+        cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
 
 def checkPlaylistExists(username, playlistName):
     with conn.cursor() as cursor:
@@ -68,25 +75,28 @@ def checkPlaylistExists(username, playlistName):
 #         return False
 
 
-#Define a route to hello function
+# Define a route to hello function
 @app.route('/')
 def hello():
     return render_template('index.html')
 
-#Define route for login
+
+# Define route for login
 @app.route('/login')
 def login():
     return render_template('login.html')
 
-#Define route for register
+
+# Define route for register
 @app.route('/register')
 def register():
     return render_template('register.html')
 
-#Authenticates the login
+
+# Authenticates the login
 @app.route('/loginAuth', methods=['GET', 'POST'])
 def loginAuth():
-    #grabs information from the forms
+    # grabs information from the forms
     username = request.form['username']
     plaintextPasword = request.form['password']
 
@@ -95,18 +105,18 @@ def loginAuth():
 
     lastlogin = time.strftime('%Y-%m-%d')
 
-    #cursor used to send queries
+    # cursor used to send queries
     cursor = conn.cursor()
-    #executes query
+    # executes query
     query = 'SELECT * FROM user WHERE username = %s and pwd = %s'
     cursor.execute(query, (username, plaintextPasword))
-    #stores the results in a variable
+    # stores the results in a variable
     data = cursor.fetchone()
-    #use fetchall() if you are expecting more than 1 data row
+    # use fetchall() if you are expecting more than 1 data row
     error = None
-    if(data):
-        #creates a session for the the user
-        #session is a built in
+    if (data):
+        # creates a session for the the user
+        # session is a built in
         session['username'] = username
         update = 'UPDATE user SET lastlogin = %s WHERE username = %s'
         cursor.execute(update, (lastlogin, username))
@@ -114,14 +124,15 @@ def loginAuth():
         cursor.close()
         return redirect(url_for('home'))
     else:
-        #returns an error message to the html page
+        # returns an error message to the html page
         error = 'Invalid login or username'
         return render_template('login.html', error=error)
 
-#Authenticates the register
+
+# Authenticates the register
 @app.route('/registerAuth', methods=['GET', 'POST'])
 def registerAuth():
-    #grabs information from the forms
+    # grabs information from the forms
     username = request.form['username']
     plaintextPasword = request.form['password']
 
@@ -131,19 +142,19 @@ def registerAuth():
     lname = request.form['Last Name']
     nickname = request.form['nickname']
 
-    #cursor used to send queries
+    # cursor used to send queries
     cursor = conn.cursor()
-    #executes query
+    # executes query
     query = 'SELECT * FROM user WHERE username = %s'
     cursor.execute(query, (username))
-    #stores the results in a variable
+    # stores the results in a variable
     data = cursor.fetchone()
-    #use fetchall() if you are expecting more than 1 data row
+    # use fetchall() if you are expecting more than 1 data row
     error = None
-    if(data):
-        #If the previous query returns data, then user exists
+    if (data):
+        # If the previous query returns data, then user exists
         error = "This user already exists"
-        return render_template('register.html', error = error)
+        return render_template('register.html', error=error)
     else:
         ins = 'INSERT INTO user VALUES(%s, %s, %s, %s, %s, %s)'
         cursor.execute(ins, (username, plaintextPasword, fname, lname, time.strftime('%Y-%m-%d %H:%M:%S'), nickname))
@@ -157,6 +168,7 @@ def logout():
     session.pop('username')
     return redirect('/')
 
+
 @app.route('/home')
 def home():
     user = session['username']
@@ -166,6 +178,7 @@ def home():
     # data = cursor.fetchall()
     cursor.close()
     return render_template('home.html', username=user)
+
 
 def _checkEmptyParams(x):
    if x == "":
@@ -236,8 +249,6 @@ def search():
         conn.commit()
         data = cursor.fetchall()
         return render_template('search.html', data=data)
-        
-        
 
     return render_template('search.html')
 
@@ -266,199 +277,368 @@ def addPlaylist():
         data = cursor.fetchall()
         print(data)
         return render_template('playlist.html', data=data)
-        
-        
-
+       
     return render_template('playlist.html')
 
-# @app.route('/post', methods=['GET', 'POST'])
-# def post():
-#     username = session['username']
-#     cursor = conn.cursor();
-#     blog = request.form['blog']
-#     query = 'INSERT INTO blog (blog_post, username) VALUES(%s, %s)'
-#     cursor.execute(query, (blog, username))
-#     conn.commit()
-#     cursor.close()
-#     return redirect(url_for('home'))
-
-# @app.route('/select_blogger')
-# def select_blogger():
-#     #check that user is logged in
-#     #username = session['username']
-#     #should throw exception if username not found
-    
-#     cursor = conn.cursor();
-#     query = 'SELECT DISTINCT username FROM blog'
-#     cursor.execute(query)
-#     data = cursor.fetchall()
-#     cursor.close()
-#     return render_template('select_blogger.html', user_list=data)
-
-# @app.route('/show_posts', methods=["GET", "POST"])
-# def show_posts():
-#     poster = request.args['poster']
-#     cursor = conn.cursor()
-#     query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
-#     cursor.execute(query, poster)
-#     data = cursor.fetchall()
-#     cursor.close()
-#     return render_template('show_posts.html', poster_name=poster, posts=data)
 
 
-# def allowed_file(filename):
-# 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-	
-# @app.route('/')
-# def upload_form():
-# 	return render_template('upload.html')
-
-# @app.route('/', methods=['POST'])
-# def upload_file():
-# 	if request.method == 'POST':
-#         # check if the post request has the file part
-# 		if 'file' not in request.files:
-# 			flash('No file part')
-# 			return redirect(request.url)
-# 		file = request.files['file']
-# 		if file.filename == '':
-# 			flash('No file selected for uploading')
-# 			return redirect(request.url)
-# 		if file and allowed_file(file.filename):
-# 			filename = secure_filename(file.filename)
-# 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-# 			flash('File successfully uploaded')
-# 			return redirect('/')
-# 		else:
-# 			flash('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
-# 			return redirect(request.url)
-
-
-
-
-#friend 
+# friend
 
 @login_required
 def fetchFriendRequests():
-  cursor = conn.cursor()
-  query = "SELECT user2 FROM friend WHERE user1 = '%s' AND acceptStatus = 'pending'" % session["username"]
-  cursor.execute(query)
-  return cursor.fetchall()
+    cursor = conn.cursor()
+    query = "SELECT user2 FROM friend WHERE user1 = '%s' AND acceptStatus = 'pending'" % session["username"]
+    cursor.execute(query)
+    return cursor.fetchall()
+
 
 @login_required
 def fetchFriends():
-  cursor = conn.cursor()
-  user = session["username"]
-  query = "SELECT user1 as myFriend FROM friend WHERE user2=%s AND acceptStatus = 'accepted' UNION SELECT user2 as myFriend FROM friend WHERE user1=%s AND acceptStatus = 'accepted'"
-  cursor.execute(query, (user, user))
-  return cursor.fetchall()
+    cursor = conn.cursor()
+    user = session["username"]
+    query = "SELECT user1 as myFriend FROM friend WHERE user2=%s AND acceptStatus = 'accepted' UNION SELECT user2 as myFriend FROM friend WHERE user1=%s AND acceptStatus = 'accepted'"
+    cursor.execute(query, (user, user))
+    return cursor.fetchall()
+
 
 @app.route("/friend", methods=["GET"])
 @login_required
 def friend():
-  request_data = fetchFriendRequests()
-  allf_data = fetchFriends()
-  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data)
+    request_data = fetchFriendRequests()
+    allf_data = fetchFriends()
+    return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
+
 
 # does not handle duplicated requests yet!
 @app.route("/friendUsername", methods=["POST"])
 @login_required
 def friendUsername():
-  if request.form:
-    requestData = request.form
-    username_friended = requestData["username_friended"]
-    username_requester = session["username"]
-    if checkUserExist(username_friended):
-      request_data = fetchFriendRequests()
-      allf_data = fetchFriends()
-      if username_friended == username_requester:
-        message = "You cannot friend yourself!"
-        return render_template("friend.html", message=message, friendRequests=request_data, allFriends = allf_data)
-      try:
-        acceptStatus = 'pending'
-        cursor = conn.cursor()
-        query = "INSERT INTO friend VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute(query, (username_friended, username_requester, acceptStatus, username_requester,
-                        time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S')))
-        conn.commit()
-        cursor.close()
-        message = "Request sent to %s." % (username_friended)
-      except:
-        message = "An error has occurred. Please try again."
-        return render_template("friend.html", message=message)
-    else:
-      message = "%s does not exist." % (username_friended)
-  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data, message=message)
+    if request.form:
+        requestData = request.form
+        username_friended = requestData["username_friended"]
+        username_requester = session["username"]
+        if checkUserExist(username_friended):
+            request_data = fetchFriendRequests()
+            allf_data = fetchFriends()
+            if username_friended == username_requester:
+                message = "You cannot friend yourself!"
+                return render_template("friend.html", message=message, friendRequests=request_data,
+                                       allFriends=allf_data)
+            try:
+                acceptStatus = 'pending'
+                cursor = conn.cursor()
+                query = "INSERT INTO friend VALUES (%s, %s, %s, %s, %s, %s)"
+                cursor.execute(query, (username_friended, username_requester, acceptStatus, username_requester,
+                                       time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S')))
+                conn.commit()
+                cursor.close()
+                message = "Request sent to %s." % (username_friended)
+            except:
+                message = "An error has occurred. Please try again."
+                return render_template("friend.html", message=message)
+        else:
+            message = "%s does not exist." % (username_friended)
+    return render_template("friend.html", friendRequests=request_data, allFriends=allf_data, message=message)
+
 
 @login_required
 @app.route("/accept/<username>", methods=["POST"])
 def accept(username):
-  username_friended = session["username"]
-  username_requester = username
-  cursor = conn.cursor()
-  query = "UPDATE friend SET acceptStatus = 'accepted', updatedAt = %s WHERE user1 = %s AND user2 = %s"
-  cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'),username_friended, username_requester))
-  conn.commit()
-  cursor.close()
+    username_friended = session["username"]
+    username_requester = username
+    cursor = conn.cursor()
+    query = "UPDATE friend SET acceptStatus = 'accepted', updatedAt = %s WHERE user1 = %s AND user2 = %s"
+    cursor.execute(query, (time.strftime('%Y-%m-%d %H:%M:%S'), username_friended, username_requester))
+    conn.commit()
+    cursor.close()
 
-  request_data = fetchFriendRequests()
-  allf_data = fetchFriends()
-  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data)
+    request_data = fetchFriendRequests()
+    allf_data = fetchFriends()
+    return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
 @login_required
 @app.route("/decline/<username>", methods=["POST"])
 def decline(username):
-  username_friended = session["username"]
-  username_requester = username
-  cursor = conn.cursor()
-  query = "DELETE FROM friend WHERE user1 = %s AND user2 = %s"
-  cursor.execute(query, (username_friended, username_requester))
-  conn.commit()
-  cursor.close()
+    username_friended = session["username"]
+    username_requester = username
+    cursor = conn.cursor()
+    query = "DELETE FROM friend WHERE user1 = %s AND user2 = %s"
+    cursor.execute(query, (username_friended, username_requester))
+    conn.commit()
+    cursor.close()
 
-  request_data = fetchFriendRequests()
-  allf_data = fetchFriends()
-  return render_template("friend.html", friendRequests=request_data, allFriends = allf_data)
+    request_data = fetchFriendRequests()
+    allf_data = fetchFriends()
+    return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
 # does not check if users are actually friends 
 @app.route("/unfriend", methods=["POST"])
 def unfriend():
-  request_data = fetchFriendRequests()
-  allf_data = fetchFriends()
+    request_data = fetchFriendRequests()
+    allf_data = fetchFriends()
 
-  if request.form:
-    requestData = request.form
-    to_unfriend = requestData["to_unfriend"]
-    currentUser = session["username"]
+    if request.form:
+        requestData = request.form
+        to_unfriend = requestData["to_unfriend"]
+        currentUser = session["username"]
 
-    if checkUserExist(to_unfriend):
-      if to_unfriend == currentUser:
-        message = "You cannot unfriend yourself!"
-        return render_template("friend.html", unfriend_message=message, username=session["username"],friendRequests=request_data, allFriends = allf_data)
-      try:
-        cursor1 = conn.cursor()
-        query = "DELETE FROM friend WHERE (user1=%s AND user2=%s) OR (user2=%s AND user1=%s) AND acceptStatus = 'accepted'"
-        cursor1.execute(query, (to_unfriend, currentUser, to_unfriend, currentUser))
-        conn.commit()
-        cursor1.close()
+        if checkUserExist(to_unfriend):
+            if to_unfriend == currentUser:
+                message = "You cannot unfriend yourself!"
+                return render_template("friend.html", unfriend_message=message, username=session["username"],
+                                       friendRequests=request_data, allFriends=allf_data)
+            try:
+                cursor1 = conn.cursor()
+                query = "DELETE FROM friend WHERE (user1=%s AND user2=%s) OR (user2=%s AND user1=%s) AND acceptStatus = 'accepted'"
+                cursor1.execute(query, (to_unfriend, currentUser, to_unfriend, currentUser))
+                conn.commit()
+                cursor1.close()
 
-        #doesn't instantly update, have to refresh 
-        message = "Successfully removed friend, refresh to see current friend list" + to_unfriend
-      except:
-        message = "Failed to unfriend " + to_unfriend
+                # doesn't instantly update, have to refresh
+                message = "Successfully removed friend, refresh to see current friend list" + to_unfriend
+            except:
+                message = "Failed to unfriend " + to_unfriend
+        else:
+            message = "user %s does not exist" % (to_unfriend)
+            return render_template("friend.html", unfriend_message=message, username=session["username"],
+                                   friendRequests=request_data, allFriends=allf_data)
+    return render_template("friend.html", unfriend_message=message, username=session["username"],
+                           friendRequests=request_data, allFriends=allf_data)
+
+
+@login_required
+@app.route("/post", methods=["GET"])
+def fetchList():
+    # Fetch all data from song, album, artist tables
+    user_id = session['username']
+    cursor = conn.cursor()
+    query = " SELECT s.songID,s.title, sIA.albumID, a.artistID, a.fname, a.lname FROM song s JOIN artistPerformsSong aPS on s.songID = aPS.songID JOIN artist a on a.artistID = aPS.artistID JOIN songInAlbum sIA on s.songID = sIA.songID;"
+    cursor.execute(query)
+    list = cursor.fetchall()
+    cursor.close()
+
+    # Error - Review
+    error_duplicate_song_review = request.args.get('error_duplicate_song_review')
+    error_empty_song_review = request.args.get('error_empty_song_review')
+    error_duplicate_album_review = request.args.get('error_duplicate_album_review')
+    error_empty_album_review = request.args.get('error_empty_album_review')
+
+    # Error - Rating
+    error_duplicate_song_rating = request.args.get('error_duplicate_song_rating')
+    error_empty_song_rating = request.args.get('error_empty_song_rating')
+    error_duplicate_album_rating = request.args.get('error_duplicate_album_rating')
+    error_empty_album_rating = request.args.get('error_empty_album_rating')
+
+    # Error -Fan
+    error_fan = request.args.get('error_fan')
+    error_artist_id = request.args.get('error_artist_id')
+
+    # Fetch all data from review, rate, fan tables
+    review_album_data, review_song_data, rating_album_data, rating_song_data, fan_data = fetchPost()
+
+    return render_template("post.html",
+                           list=list,
+                           user_id=user_id,
+                           error_duplicate_song_review=error_duplicate_song_review,
+                           error_empty_song_review=error_empty_song_review,
+                           error_duplicate_album_review=error_duplicate_album_review,
+                           error_empty_album_review=error_empty_album_review,
+                           error_duplicate_song_rating=error_duplicate_song_rating,
+                           error_empty_song_rating=error_empty_song_rating,
+                           error_duplicate_album_rating=error_duplicate_album_rating,
+                           error_empty_album_rating=error_empty_album_rating,
+                           error_fan=error_fan,
+                           error_artist_id=error_artist_id,
+                           review_album_data=review_album_data,
+                           review_song_data=review_song_data,
+                           rating_album_data=rating_album_data,
+                           rating_song_data=rating_song_data,
+                           fan_data=fan_data
+                           )
+
+
+def fetchPost():
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM reviewAlbum")
+    review_album_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM reviewSong")
+    review_song_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM rateAlbum")
+    rating_album_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM rateSong")
+    rating_song_data = cursor.fetchall()
+    cursor.execute("SELECT * FROM userFanOfArtist")
+    fan_data = cursor.fetchall()
+
+    cursor.close()
+    return review_album_data, review_song_data, rating_album_data, rating_song_data, fan_data
+
+
+@login_required
+@app.route("/reviewAlbum", methods=["POST"])
+def review_album():
+    cursor = conn.cursor()
+    album_id = request.form['album_id']
+    review_text = request.form['review_text'].strip()
+    user_id = session['username']
+    review_date = datetime.now()
+
+    # Check if the input field is empty
+    if not review_text:
+        return redirect(url_for('fetchList', error_empty_album_review=album_id))
+
+    # Check if the user already posted a review for the album
+    check_query = "SELECT * FROM reviewAlbum WHERE albumID = %s AND username = %s;"
+    cursor.execute(check_query, (album_id, user_id))
+    existing_review = cursor.fetchone()
+    if existing_review:
+        cursor.close()
+        return redirect(url_for('fetchList', error_duplicate_album_review=album_id))
+
+    # Save review in the database
+    insert_query = "INSERT INTO reviewAlbum (albumID, username, reviewText, reviewDate) VALUES (%s, %s, %s,%s);"
+    cursor.execute(insert_query, (album_id, user_id, review_text, review_date))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))  # Redirect back to the list page
+
+
+@login_required
+@app.route("/reviewSong", methods=["POST"])
+def review_song():
+    cursor = conn.cursor()
+    song_id = request.form['song_id']
+    review_text = request.form['review_text'].strip()
+    user_id = session['username']
+    review_date = datetime.now()
+
+    # Check if the input field is empty
+    if not review_text:
+        return redirect(url_for('fetchList', error_empty_song_review=song_id))
+
+    # Check if the user already posted a review for the song
+    check_query = "SELECT * FROM reviewSong WHERE songID = %s AND username = %s;"
+    cursor.execute(check_query, (song_id, user_id))
+    existing_review = cursor.fetchone()
+    if existing_review:
+        cursor.close()
+        return redirect(url_for('fetchList', error_duplicate_song_review=song_id))
+
+    # Save review in the database
+    insert_query = "INSERT INTO reviewSong (songID, username, reviewText, reviewDate) VALUES (%s, %s, %s,%s);"
+    cursor.execute(insert_query, (song_id, user_id, review_text, review_date))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))
+
+
+@login_required
+@app.route("/rateAlbum", methods=["POST"])
+def rate_album():
+    cursor = conn.cursor()
+    album_id = request.form['album_id']
+    rating = int(request.form['rating'])
+    user_id = session['username']
+    # rate_date = datetime.now()
+
+    # Check if the input field is empty
+    if rating == 0:
+        return redirect(url_for('fetchList', error_empty_album_rating=album_id))
+
+    # Check if the user already posted a rating for the album
+    check_query = "SELECT * FROM rateAlbum WHERE albumID = %s AND username = %s;"
+    cursor.execute(check_query, (album_id, user_id))
+    existing_review = cursor.fetchone()
+    if existing_review:
+        cursor.close()
+        return redirect(url_for('fetchList', error_duplicate_album_rating=album_id))
+
+    # Save rating in the database
+    # save_query = "INSERT INTO rateAlbum (albumID, username, stars, ratingDate) VALUES (%s, %s, %s, %s);"
+    # cursor.execute(save_query, (album_id, user_id, rating, rate_date))
+    save_query = "INSERT INTO rateAlbum (albumID, username, stars) VALUES (%s, %s, %s);"
+    cursor.execute(save_query, (album_id, user_id, rating))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))
+
+
+@login_required
+@app.route("/rateSong", methods=["POST"])
+def rate_song():
+    cursor = conn.cursor()
+    song_id = request.form['song_id']
+    rating = int(request.form['rating'])
+    user_id = session['username']
+    rate_date = datetime.now()
+
+    # Check if the input field is empty
+    if rating == 0:
+        return redirect(url_for('fetchList', error_empty_song_rating=song_id))
+
+    # Check if the user already posted a rating for the song
+    check_query = "SELECT * FROM rateSong WHERE songID = %s AND username = %s;"
+    cursor.execute(check_query, (song_id, user_id))
+    existing_review = cursor.fetchone()
+    if existing_review:
+        cursor.close()
+        return redirect(url_for('fetchList', error_duplicate_song_rating=song_id))
+
+    # Save rating in the database
+    save_query = "INSERT INTO rateSong (songID, username, stars, ratingDate) VALUES (%s, %s, %s, %s);"
+    cursor.execute(save_query, (song_id, user_id, rating, rate_date))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))
+
+
+@login_required
+@app.route("/fanOfArtist", methods=["POST"])
+def fan_of_artist():
+    cursor = conn.cursor()
+    artist_id = request.form['artist_id']
+    is_fan = request.form.get('is_fan', 'off') == 'on'
+    user_id = session['username']
+    error_fan = ""
+
+    # Check if user is already a fan
+    check_query = "SELECT * FROM userFanOfArtist WHERE username = %s AND artistID = %s;"
+    cursor.execute(check_query, (user_id, artist_id))
+    result = cursor.fetchone()
+
+    if is_fan:
+        # Insert fan relationship in the database only if not already a fan
+        if not result:
+            save_query = "INSERT INTO userFanOfArtist (username, artistID) VALUES (%s, %s);"
+            cursor.execute(save_query, (user_id, artist_id))
+        else:
+            error_fan = "You are already a fan of this artist."
     else:
-      message = "user %s does not exist" % (to_unfriend)
-      return render_template("friend.html", unfriend_message=message, username=session["username"],friendRequests=request_data, allFriends = allf_data)
-  return render_template("friend.html", unfriend_message=message, username=session["username"],friendRequests=request_data, allFriends = allf_data)
+        # Remove fan relationship from the database only if user is a fan
+        if result:
+            delete_query = "DELETE FROM userFanOfArtist WHERE username = %s AND artistID = %s;"
+            cursor.execute(delete_query, (user_id, artist_id))
+        else:
+            error_fan = "You are not a fan of this artist."
+
+    conn.commit()
+    cursor.close()
+
+    if error_fan:
+        return redirect(url_for('fetchList', error_fan=error_fan, error_artist_id=artist_id))
+    else:
+        return redirect(url_for('fetchList'))
 
 
-
-        
 app.secret_key = 'some key that you will never guess'
-#Run the app on localhost port 5000
-#debug = True -> you don't have to restart flask
-#for changes to go through, TURN OFF FOR PRODUCTION
+# Run the app on localhost port 5000
+# debug = True -> you don't have to restart flask
+# for changes to go through, TURN OFF FOR PRODUCTION
 if __name__ == "__main__":
-    app.run('127.0.0.1', 5000, debug = True)
+    app.run('127.0.0.1', 5000, debug=True)

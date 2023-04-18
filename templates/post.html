@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+            crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <title>Post</title>
+    <!-- URL Modification -->
+    <script>
+        if (window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>List</h2>
+    <h3>username: {{ user_id }}</h3>
+    {% if list %}
+        <ul style="list-style-type: none;">
+            {% for data in list %}
+                <li style="margin-bottom: 1rem;">
+                    <div style="display: flex;">
+                        <!-- POST -->
+                        <div class="card" style="width: 100%">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ data.title }}</h5>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">
+                                    Artist: {{ data.fname }} {{ data.lname }}</h6>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">Album: {{ data.albumID }} </h6>
+
+
+                                <form action="/reviewAlbum" method="POST">
+                                    <div style="display: flex; column-gap: 10px; justify-content: space-between; margin-bottom: 1rem">
+                                        <div class="form-floating" style="width: 100%">
+                                            <input type="text" class="form-control" name="review_text"
+                                                   id="floatingInput"
+                                                   placeholder="review album">
+                                            <label for="floatingInput">Review Album</label>
+                                        </div>
+
+                                        <input type="hidden" name="album_id" value="{{ data.albumID }}">
+                                        <button type="submit" class="btn btn-primary ">Post</button>
+                                    </div>
+                                </form>
+                                {% if (error_empty_album_review and error_empty_album_review == data.albumID) or (error_duplicate_album_review and error_duplicate_album_review == data.albumID) %}
+                                    <p class="error text-danger">
+                                        <strong>Error:</strong> {{ "Review cannot be empty." if error_empty_album_review else "You have already posted a review for this album." }}
+                                    </p>
+                                {% endif %}
+                                <form action="/reviewSong" method="POST">
+                                    <div style="display: flex; column-gap: 10px; justify-content: space-between; margin-bottom: 1rem">
+                                        <div class="form-floating" style="width: 100%">
+                                            <input type="text" class="form-control" id="floatingInput"
+                                                   name="review_text"
+                                                   placeholder="review song">
+                                            <label for="floatingInput">Review Song</label>
+
+                                        </div>
+
+                                        <input type="hidden" name="song_id" value="{{ data.songID }}">
+                                        <button type="submit" class="btn btn-primary ">Post</button>
+                                    </div>
+
+                                    {% if (error_empty_song_review and error_empty_song_review == data.songID) or (error_duplicate_song_review and error_duplicate_song_review == data.songID) %}
+                                        <p class="error text-danger">
+                                            <strong>Error:</strong> {{ "Review cannot be empty." if error_empty_song_review else "You have already posted a review for this song." }}
+                                        </p>
+                                    {% endif %}
+                                </form>
+                                <form action="/rateAlbum" method="POST">
+                                    <div style="display: flex; column-gap: 10px; justify-content: space-between; margin-bottom: 1rem">
+                                        <select class="form-select" name="rating" aria-label="Default select example">
+                                            <option selected value="0">Rate Album</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+
+                                        <input type="hidden" name="album_id" value="{{ data.albumID }}">
+                                        <button type="submit" class="btn btn-primary ">Post</button>
+                                    </div>
+
+                                    {% if (error_empty_album_rating and error_empty_album_rating == data.albumID) or (error_duplicate_album_rating and error_duplicate_album_rating == data.albumID) %}
+                                        <p class="error text-danger">
+                                            <strong>Error:</strong> {{ "Review cannot be empty." if error_empty_album_rating else "You have already posted a review for this album." }}
+                                        </p>
+                                    {% endif %}
+                                </form>
+                                <form action="/rateSong" method="POST">
+                                    <div style="display: flex; column-gap: 10px; justify-content: space-between; margin-bottom: 1rem">
+                                        <select class="form-select" name="rating" aria-label="Default select example">
+                                            <option selected value="0">Rate Song</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                        <input type="hidden" name="song_id" value="{{ data.songID }}">
+                                        <button type="submit" class="btn btn-primary ">Post</button>
+                                    </div>
+
+                                    {% if (error_empty_song_rating and error_empty_song_rating == data.songID) or (error_duplicate_song_rating and error_duplicate_song_rating == data.songID) %}
+                                        <p class="error text-danger">
+                                            <strong>Error:</strong> {{ "Review cannot be empty." if error_empty_song_rating else "You have already posted a review for this song." }}
+                                        </p>
+                                    {% endif %}
+                                </form>
+                                <form action="/fanOfArtist" method="POST">
+                                    <div style="display: flex; column-gap: 10px; justify-content: space-between; margin-bottom: 1rem">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="is_fan" value="on"
+                                                   id="flexCheckDefault">
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                Fan of the artist
+                                            </label>
+                                        </div>
+                                        <input type="hidden" name="artist_id" value="{{ data.artistID }}">
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+                                    {% if error_fan and error_artist_id == data.artistID %}
+                                        <p class="error text-danger">
+                                            <strong>Error:</strong> {{ error_fan }}
+                                        </p>
+                                    {% endif %}
+                                </form>
+
+                            </div>
+                        </div>
+                        <!-- SONG -->
+                        <div class="card" style="width: 100%;">
+                            <div class="card-body">
+                                <h5 class="card-title">SONG</h5>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">{{ data.title }}</h6>
+                                <div class="card-text">
+                                    <h5 style="margin-top: 1rem">Review</h5>
+                                    <ul class="list-group">
+                                        {% for review in review_song_data %}
+                                            {% if review.songID == data.songID %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ review.username }}:</strong> {{ review.reviewText }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                    <h5 style="margin-top: 1rem">Rating</h5>
+                                    <ul class="list-group">
+                                        {% for rating in rating_song_data %}
+                                            {% if rating.songID == data.songID %}
+                                                <li class="list-group-item"><strong>{{ rating.username }}:</strong>
+                                                    {{ rating.stars }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ALBUM -->
+                        <div class="card" style="width: 100%;">
+                            <div class="card-body">
+                                <h5 class="card-title">ALBUM</h5>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">{{ data.albumID }}</h6>
+                                <div class="card-text">
+                                    <h5 style="margin-top: 1rem">Review</h5>
+                                    <ul class="list-group">
+                                        {% for review in review_album_data %}
+                                            {% if review.albumID == data.albumID %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ review.username }}:</strong> {{ review.reviewText }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                    <h5 style="margin-top: 1rem">Rating</h5>
+                                    <ul class="list-group">
+                                        {% for rating in rating_album_data %}
+                                            {% if rating.albumID == data.albumID %}
+                                                <li class="list-group-item"><strong>{{ rating.username }}:</strong>
+                                                    {{ rating.stars }}
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                        <!-- FAN -->
+                        <div class="card" style="width: 100%;">
+                            <div class="card-body">
+                                <h5 class="card-title">List of FANS</h5>
+                                <h6 class="card-subtitle mb-2 text-body-secondary">{{ data.fname }} {{ data.lname }}</h6>
+                                <div class="card-text">
+
+                                    <ul class="list-group" style="margin-top: 1rem">
+                                        {% for fan in fan_data %}
+                                            {% if fan.artistID == data.artistID %}
+                                                <li class="list-group-item">
+                                                    <strong>{{ fan.username }}</strong>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <span>No song list</span>
+    {% endif %}
+</div>
+</body>
+</html>
