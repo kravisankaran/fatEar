@@ -13,6 +13,9 @@
             <input type="text" placeholder="Search by song" name="song">
             <input type="text" placeholder="Search by artist (First Name)" name ="artistFName">
             <input type="text" placeholder="Search by artist (Last Name)" name ="artistLName">
+            <input type="text" placeholder="Search by Album" name ="album">
+            <input type="text" placeholder="Search by Rating" name ="rating">
+            <input type="text" placeholder="Search by Genre" name ="genre">
             <button type="submit"><i class="fa fa-search"></i>
             </button>
         </form>
@@ -20,7 +23,13 @@
         <center>
         {% for item in data %}
             <tr>
-                <td> {{item.title}} released on {{item.releaseDate}} by {{item.fname}} {{item.lname}}</td>
+                <td> {{item.title}} </td>
+                </br>
+                <td> released on {{item.releaseDate}} </td>    
+                </br> 
+                <td> by {{item.fname}} {{item.lname}} </td> 
+                </br> 
+                <td> present in {{item.albumName}} </td>
                 </br>
             </tr>
         {% endfor %}

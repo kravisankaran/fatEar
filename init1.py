@@ -186,34 +186,66 @@ def _checkEmptyParams(x):
    else:
       return 1
    
-def getSearchQuery(x, song, fname, lname):
-    if x['s'] and x['f'] and x['l'] :
-        print ('all 3 are present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.fname like %s and a.lname like %s", (song,fname,lname)
+def getSearchQuery(x, song, fname, lname, album, rating, genre):
+    if x['s'] and x['a'] and x['f'] and x['l']:
+        print('song, fname, lastname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s", (song, fname, lname, album)
+    
+    elif x['s'] and x['f'] and x['a']:
+        print('song, fname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s and a.fname like %s and alb.albumName like %s", (song, fname, album)
+   
+    elif x['s'] and x['l'] and x['a']:
+        print('song, lname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s", (song, lname, album)
+    
+    elif x['f'] and x['l'] and x['a']:
+        print('fname, lname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where a.fname like %s and a.lname like %s and alb.albumName like %s", (fname, lname, album)
+    
+    elif x['s'] and x['f'] and x['l'] :
+        print ('song, artist fname, artist lname are present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s and a.fname like %s and a.lname like %s", (song, fname, lname)
+    
     elif x['s'] and x['f'] :
         print('song and artist fname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.fname like %s", (song,fname)
-
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s and a.fname like %s", (song,fname)
+    
     elif x['s'] and x['l']:
         print ('song and artist lname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.lname like %s", (song,lname)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s and a.lname like %s", (song,lname)
 
     elif x['f'] and x['l']:
         print('artist fname and lname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.fname like %s and a.lname like %s", (fname, lname)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where a.fname like %s and a.lname like %s", (fname, lname)
 
+    elif x['f'] and x['a']:
+        print ('artist fname and album name present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where a.fname like %s and alb.albumName like %s", (fname, album)
+    
+    elif x['l'] and x['a']:
+        print ('artist fname and album name present') 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where a.lname like %s and alb.albumName like %s", (lname, album)
+    
+    elif x['s'] and x['a']:
+        print ('song and album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s and alb.albumName like %s", (song, album)
+    
     elif x['f']:
         print ('only firstname')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.fname like %s", (fname)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where a.fname like %s", (fname)
 
     elif x['l']:
         print ('only lastname')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.lname like %s", (lname)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where a.lname like %s", (lname)
 
     elif x['s']:
         print ('only song')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s", (song)
-
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where title like %s", (song)
+    elif x['a']:
+        print ('only album')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join artist a where alb.albumName like %s", (album)
+    
     else:
        print('nothing was picked')
 
@@ -224,16 +256,21 @@ def search():
         song = request.form['song']
         artistFName = request.form['artistFName']
         artistLName = request.form['artistLName']
-        # album = request.form['album']
+        album = request.form['album']
+        rating = request.form['rating']
+        genre = request.form['genre']
+
         print(song)
         print(artistFName)
         print(artistLName)
-        # print(album)
+        print(album)
+        print(rating)
+        print(genre)
        
         cursor = conn.cursor()
         # song, artistF, artistLast, album
-        searchParams = [song, artistFName, artistLName]
-        keys = ["s", "f", "l"]
+        searchParams = [song, artistFName, artistLName, album, rating, genre]
+        keys = ["s", "f", "l", "a", "r", "g"]
         
         status = list(map(_checkEmptyParams, searchParams))
         parameterMap = {keys[i]: status[i] for i in range(len(keys))}
@@ -242,8 +279,9 @@ def search():
         song2 = "%" + song + "%"
         artistFName2 = "%" + artistFName + "%"
         artistLName2 = "%" + artistLName + "%"
-        #album = "%" + album + "%"
-        query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2)
+        album = "%" + album + "%"
+        genre = "%" + genre + "%"
+        query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2, album, rating, genre)
         print(query)
         cursor.execute(query[0], query[1])
         conn.commit()
