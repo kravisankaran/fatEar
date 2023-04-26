@@ -310,9 +310,9 @@ def friend():
 
 
 # does not handle duplicated requests yet!
-@app.route("/friendUsername", methods=["POST"])
+@app.route("/friendUser", methods=["POST"])
 @login_required
-def friendUsername():
+def friendUser():
     if request.form:
         requestData = request.form
         username_friended = requestData["username_friended"]
@@ -325,14 +325,28 @@ def friendUsername():
                 return render_template("friend.html", message=message, friendRequests=request_data,
                                        allFriends=allf_data)
             try:
-                acceptStatus = 'pending'
-                cursor = conn.cursor()
-                query = "INSERT INTO friend VALUES (%s, %s, %s, %s, %s, %s)"
-                cursor.execute(query, (username_friended, username_requester, acceptStatus, username_requester,
-                                       time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S')))
-                conn.commit()
-                cursor.close()
-                message = "Request sent to %s." % (username_friended)
+                cursor1 = conn.cursor()
+                statusQuery = "SELECT acceptStatus FROM friend WHERE (user1 = %s AND user2 = %s) OR (user2 = %s AND user1 = %s)"
+                cursor1.execute(statusQuery, (username_friended, username_requester, username_friended, username_requester))
+                friendStatus = cursor1.fetchall()
+                cursor1.close()
+                
+                # check if user 1 and 2 are already friends, or if there's already a pending request
+                if len(friendStatus) > 0:
+                    if friendStatus[0].get("acceptStatus") == "accepted":
+                        message = "You are already friends with %s." % (username_friended)
+                    elif friendStatus[0].get("acceptStatus") == "pending":
+                        message = "There is already a pending friend request between you and %s." % (username_friended)
+                else:
+                    acceptStatus = 'pending'
+                    cursor = conn.cursor()
+                    query = "INSERT INTO friend VALUES (%s, %s, %s, %s, %s, %s)"
+                    cursor.execute(query, (username_friended, username_requester, acceptStatus, username_requester,
+                                        time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S')))
+                    conn.commit()
+                    cursor.close()
+                    message = "Request sent to %s." % (username_friended)
+
             except:
                 message = "An error has occurred. Please try again."
                 return render_template("friend.html", message=message)
@@ -391,13 +405,23 @@ def unfriend():
                                        friendRequests=request_data, allFriends=allf_data)
             try:
                 cursor1 = conn.cursor()
-                query = "DELETE FROM friend WHERE (user1=%s AND user2=%s) OR (user2=%s AND user1=%s) AND acceptStatus = 'accepted'"
-                cursor1.execute(query, (to_unfriend, currentUser, to_unfriend, currentUser))
-                conn.commit()
+                statusQuery = "SELECT acceptStatus FROM friend WHERE (user1 = %s AND user2 = %s) OR (user2 = %s AND user1 = %s)"
+                cursor1.execute(statusQuery, (currentUser, to_unfriend, currentUser, to_unfriend))
+                friendStatus = cursor1.fetchall()
                 cursor1.close()
+                
+                # check if user 1 and 2 are currently friends
+                if len(friendStatus) > 0 and friendStatus[0].get("acceptStatus") == "accepted":
+                    cursor1 = conn.cursor()
+                    query = "DELETE FROM friend WHERE (user1=%s AND user2=%s) OR (user2=%s AND user1=%s) AND acceptStatus = 'accepted'"
+                    cursor1.execute(query, (to_unfriend, currentUser, to_unfriend, currentUser))
+                    conn.commit()
+                    cursor1.close()
 
-                # doesn't instantly update, have to refresh
-                message = "Successfully removed friend, refresh to see current friend list" + to_unfriend
+                    # doesn't instantly update, have to refresh
+                    message = "Successfully removed friend, refresh to see current friend list" 
+                else: 
+                    message = "You and %s are not friends" % (to_unfriend)
             except:
                 message = "Failed to unfriend " + to_unfriend
         else:
