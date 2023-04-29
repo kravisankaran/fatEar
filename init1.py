@@ -535,6 +535,116 @@ def unfriend():
                            friendRequests=request_data, allFriends=allf_data)
 
 
+# follow
+
+@login_required
+def fetchFollowing():
+    cursor = conn.cursor()
+    user = session["username"]
+    query = "SELECT follows as myFollowing FROM follows WHERE follower=%s"
+    cursor.execute(query, (user))
+    return cursor.fetchall()
+
+@login_required
+def fetchFollower():
+    cursor = conn.cursor()
+    user = session["username"]
+    query = "SELECT follower as myFollower FROM follows WHERE follows=%s"
+    cursor.execute(query, (user))
+    return cursor.fetchall()
+
+@app.route("/follow", methods=["GET"])
+@login_required
+def follow():
+    allf_data = fetchFollowing()
+    followersData = fetchFollower()
+    return render_template("follow.html",  allFollowing=allf_data, allFollower=followersData)
+
+@app.route("/followUser", methods=["POST"])
+@login_required
+def followUser():
+    if request.form:
+        requestData = request.form
+        username_following = requestData["username_following"]
+        username_follower = session["username"]
+        if checkUserExist(username_following):
+            allf_data = fetchFollowing()
+            followersData = fetchFollower()
+            if username_following == username_follower:
+                message = "You cannot follow yourself!"
+                return render_template("follow.html", message=message, allFollowing=allf_data, allFollower=followersData)
+            try:
+                cursor1 = conn.cursor()
+                statusQuery = "SELECT follows as myFollowing FROM follows WHERE follower=%s and follows=%s"
+                cursor1.execute(statusQuery, (username_follower, username_following))
+                followStatus = cursor1.fetchall()
+                cursor1.close()
+                
+                # check if user already follows the other user
+                if len(followStatus) > 0:
+                    message = "You are already follow %s." % (username_following)
+                else:
+                    cursor = conn.cursor()
+                    query = "INSERT INTO follows VALUES (%s, %s, %s)"
+                    cursor.execute(query, (username_follower,username_following, time.strftime('%Y-%m-%d %H:%M:%S')))
+                    conn.commit()
+                    cursor.close()
+                    message = "You are now following %s, refresh to see current following list" % (username_following)
+
+            except:
+                message = "An error has occurred. Please try again."
+                return render_template("follow.html", allFollowing=allf_data, allFollower=followersData, message=message)
+        else:
+            message = "%s does not exist." % (username_following)
+    return render_template("follow.html", allFollowing=allf_data, allFollower=followersData, message=message)
+
+
+@app.route("/unfollow", methods=["POST"])
+def unfollow():
+    allf_data = fetchFollowing()
+    followersData = fetchFollower()
+
+    if request.form:
+        requestData = request.form
+        to_unfollow = requestData["to_unfollow"]
+        currentUser = session["username"]
+
+        if checkUserExist(to_unfollow):
+            if to_unfollow == currentUser:
+                message = "You cannot unfollow yourself!"
+                return render_template("follow.html", unfollow_message=message, username=session["username"],
+                                       allFollowing=allf_data, allFollower=followersData)
+            try:
+                cursor1 = conn.cursor()
+                statusQuery = "SELECT follows as myFollowing FROM follows WHERE follower=%s and follows=%s"
+                cursor1.execute(statusQuery, (currentUser, to_unfollow))
+                followStatus = cursor1.fetchall()
+                cursor1.close()
+                
+                # check if user is currently following the other user
+                if len(followStatus) > 0:
+                    cursor1 = conn.cursor()
+                    query = "DELETE FROM follow WHERE follower=%s and follows=%s"
+                    cursor1.execute(query, (currentUser, to_unfollow))
+                    conn.commit()
+                    cursor1.close()
+
+                    # doesn't instantly update, have to refresh
+                    message = "Successfully unfollowed, refresh to see current following list" 
+                else: 
+                    message = "You are not following %s" % (to_unfollow)
+            except:
+                message = "Failed to unfollow " + to_unfollow
+        else:
+            message = "user %s does not exist" % (to_unfollow)
+            return render_template("follow.html", unfollow_message=message, username=session["username"],
+                                   allFollowing=allf_data, allFollower=followersData)
+    return render_template("follow.html", unfollow_message=message, username=session["username"],
+                           allFollowing=allf_data, allFollower=followersData)
+
+
+# post 
+
 @login_required
 @app.route("/post", methods=["GET"])
 def fetchList():
