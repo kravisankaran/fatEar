@@ -36,6 +36,18 @@
             {{ unfollow_message }}
           {% endif %}
         </div>
+        <br>
+
+        <div>
+            <form action="/removeFollow" method="post">
+                <h3>Remove a follower:</h3>
+                <input type="text" name="to_remove" placeholder="Follower to remove" required/>
+                <input type="submit" value="Remove">
+            </form>
+              {% if remove_message %}
+                {{ remove_message }}
+              {% endif %}
+            </div>
 
         <br>
         <h3>All users you're following: </h3>

@@ -624,7 +624,7 @@ def unfollow():
                 # check if user is currently following the other user
                 if len(followStatus) > 0:
                     cursor1 = conn.cursor()
-                    query = "DELETE FROM follow WHERE follower=%s and follows=%s"
+                    query = "DELETE FROM follows WHERE follower=%s and follows=%s"
                     cursor1.execute(query, (currentUser, to_unfollow))
                     conn.commit()
                     cursor1.close()
@@ -641,6 +641,52 @@ def unfollow():
                                    allFollowing=allf_data, allFollower=followersData)
     return render_template("follow.html", unfollow_message=message, username=session["username"],
                            allFollowing=allf_data, allFollower=followersData)
+
+
+@app.route("/removeFollow", methods=["POST"])
+def removeFollow():
+    allf_data = fetchFollowing()
+    followersData = fetchFollower()
+
+    if request.form:
+        requestData = request.form
+        to_remove = requestData["to_remove"]
+        currentUser = session["username"]
+
+        if checkUserExist(to_remove):
+            if to_remove == currentUser:
+                message = "You cannot remove yourself as a follower!"
+                return render_template("follow.html", remove_message=message, username=session["username"],
+                                       allFollowing=allf_data, allFollower=followersData)
+            try:
+                cursor1 = conn.cursor()
+                statusQuery = "SELECT follows as myFollowing FROM follows WHERE follows=%s and follower=%s"
+                cursor1.execute(statusQuery, (currentUser, to_remove))
+                followStatus = cursor1.fetchall()
+                cursor1.close()
+                
+                # check if the to-be-removed user is currently following the loggedin user
+                if len(followStatus) > 0:
+                    cursor1 = conn.cursor()
+                    query = "DELETE FROM follows WHERE follows=%s and follower=%s"
+                    cursor1.execute(query, (currentUser, to_remove))
+                    conn.commit()
+                    cursor1.close()
+
+                    # doesn't instantly update, have to refresh
+                    message = "Successfully removed follower, refresh to see current following list" 
+                else: 
+                    message = "%s is not your follower" % (to_remove)
+            except:
+                message = "Failed to remove " + to_remove
+        else:
+            message = "user %s does not exist" % (to_remove)
+            return render_template("follow.html", remove_message=message, username=session["username"],
+                                   allFollowing=allf_data, allFollower=followersData)
+    return render_template("follow.html", remove_message=message, username=session["username"],
+                           allFollowing=allf_data, allFollower=followersData)
+
+
 
 
 # post 
