@@ -417,13 +417,14 @@ def friend():
 @app.route("/friendUser", methods=["POST"])
 @login_required
 def friendUser():
+    request_data = fetchFriendRequests()
+    allf_data = fetchFriends()
+
     if request.form:
         requestData = request.form
         username_friended = requestData["username_friended"]
         username_requester = session["username"]
         if checkUserExist(username_friended):
-            request_data = fetchFriendRequests()
-            allf_data = fetchFriends()
             if username_friended == username_requester:
                 message = "You cannot friend yourself!"
                 return render_template("friend.html", message=message, friendRequests=request_data,
@@ -456,7 +457,8 @@ def friendUser():
                 return render_template("friend.html", message=message)
         else:
             message = "%s does not exist." % (username_friended)
-    return render_template("friend.html", friendRequests=request_data, allFriends=allf_data, message=message)
+    return render_template("friend.html", message=message, username=session["username"],
+                                   friendRequests=request_data, allFriends=allf_data)
 
 
 @login_required
@@ -563,13 +565,14 @@ def follow():
 @app.route("/followUser", methods=["POST"])
 @login_required
 def followUser():
+    allf_data = fetchFollowing()
+    followersData = fetchFollower()
+    
     if request.form:
         requestData = request.form
         username_following = requestData["username_following"]
         username_follower = session["username"]
         if checkUserExist(username_following):
-            allf_data = fetchFollowing()
-            followersData = fetchFollower()
             if username_following == username_follower:
                 message = "You cannot follow yourself!"
                 return render_template("follow.html", message=message, allFollowing=allf_data, allFollower=followersData)
