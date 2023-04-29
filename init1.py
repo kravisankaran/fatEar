@@ -186,33 +186,130 @@ def _checkEmptyParams(x):
    else:
       return 1
    
-def getSearchQuery(x, song, fname, lname):
-    if x['s'] and x['f'] and x['l'] :
-        print ('all 3 are present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.fname like %s and a.lname like %s", (song,fname,lname)
+def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
+    if x['s'] and x['a'] and x['f'] and x['l'] and x['r']:
+        print('song, album, fname, lname, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s and rat.stars = %s", (song, fname, lname, album, ratingVal)
+
+    elif x['s'] and x['a'] and x['f'] and x['l']:
+        print('song, fname, lastname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s", (song, fname, lname, album)
+    
+    elif x['s'] and x['a'] and x['r'] and x['f']: 
+        print('song, album, rating, fname present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s  and alb.albumName like %s and rat.stars = %s", (song, fname, album, ratingVal)
+
+    elif x['s'] and x['a'] and x['r'] and x['l']: 
+        print('song, album, rating, lname present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s and rat.stars = %s", (song, lname, album, ratingVal)
+    
+    elif x['f'] and x['a'] and x['r'] and x['l']: 
+        print('fname, lname, album, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where a.fname like %s and a.lname like %s  and alb.albumName like %s and rat.stars = %s", (fname, lname, album, ratingVal)
+   
+    elif x['f'] and x['s'] and x['r'] and x['l']: 
+        print('song, fname, lname, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and rat.stars = %s", (song, fname, lname, ratingVal)
+
+    elif x['s'] and x['f'] and x['a']:
+        print('song, fname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and alb.albumName like %s", (song, fname, album)
+   
+    elif x['s'] and x['f'] and x['r']:
+        print('song, fname, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and rat.stars = %s", (song, fname, ratingVal)
+    
+    elif x['s'] and x['l'] and x['a']:
+        print('song, lname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s", (song, lname, album)
+    
+    elif x['s'] and x['l'] and x['r']:
+        print('song, lname, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s and rat.stars = %s", (song, lname, ratingVal)
+    
+    elif x['f'] and x['l'] and x['a']:
+        print('fname, lname, album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s and alb.albumName like %s", (fname, lname, album)
+    
+    elif x['f'] and x['l'] and x['r']:
+        print('fname, lname, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s and rat.stars = %s", (fname, lname, ratingVal)
+
+    elif x['a'] and x['l'] and x['r']:
+        print('lname ,album, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and alb.albumName like %s and rat.stars = %s", (lname, album, ratingVal)
+
+    elif x['a'] and x['f'] and x['r']:
+        print('fname, album, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and alb.albumName like %s and rat.stars = %s", (fname, album, ratingVal)
+
+    elif x['a'] and x['s'] and x['r']:
+        print('song, album, rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and alb.albumName like %s and rat.stars = %s", (song, album, ratingVal)
+
+    elif x['s'] and x['f'] and x['l'] :
+        print ('song, artist fname, artist lname are present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.fname like %s and a.lname like %s", (song, fname, lname)
+    
+    
     elif x['s'] and x['f'] :
         print('song and artist fname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.fname like %s", (song,fname)
-
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.fname like %s", (song,fname)
+    
     elif x['s'] and x['l']:
         print ('song and artist lname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s and a.lname like %s", (song,lname)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.lname like %s", (song,lname)
 
     elif x['f'] and x['l']:
         print('artist fname and lname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.fname like %s and a.lname like %s", (fname, lname)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s", (fname, lname)
+
+    elif x['f'] and x['a']:
+        print ('artist fname and album name present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and alb.albumName like %s", (fname, album)
+    
+    elif x['l'] and x['a']:
+        print ('artist fname and album name present') 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and alb.albumName like %s", (lname, album)
+    
+    elif x['s'] and x['a']:
+        print ('song and album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and alb.albumName like %s", (song, album)
+    
+    elif x['s'] and x['r']:
+        print('song and rating present') 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and rat.stars like %s", (song, ratingVal)
+
+    elif x['a'] and x['r']:
+        print('album and rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where alb.albumName like %s and rat.stars like %s", (album, ratingVal)
+
+    elif x['f'] and x['r']:
+        print('fname and rating present')   
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and rat.stars like %s", (fname, ratingVal)
+
+    elif x['l'] and x['r']:
+        print('lname and rating present') 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and rat.stars like %s", (lname, ratingVal)
 
     elif x['f']:
         print ('only firstname')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.fname like %s", (fname)
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (fname)
 
     elif x['l']:
         print ('only lastname')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where a.lname like %s", (lname)
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (lname)
 
     elif x['s']:
         print ('only song')
-        return "select s.title, a.fname, a.lname, s.releaseDate from song s natural join artistPerformsSong asp natural join artist a where title like %s", (song)
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a   where title like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (song)
+    elif x['a']:
+        print ('only album')
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (album)
+    
+    elif x['r']:
+        print ('only rating')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where rat.stars like %s", (ratingVal)
 
     else:
        print('nothing was picked')
@@ -224,16 +321,21 @@ def search():
         song = request.form['song']
         artistFName = request.form['artistFName']
         artistLName = request.form['artistLName']
-        # album = request.form['album']
+        album = request.form['album']
+        rating = request.form['rating']
+        genre = request.form['genre']
+
         print(song)
         print(artistFName)
         print(artistLName)
-        # print(album)
+        print(album)
+        print(rating)
+        print(genre)
        
         cursor = conn.cursor()
         # song, artistF, artistLast, album
-        searchParams = [song, artistFName, artistLName]
-        keys = ["s", "f", "l"]
+        searchParams = [song, artistFName, artistLName, album, rating, genre]
+        keys = ["s", "f", "l", "a", "r", "g"]
         
         status = list(map(_checkEmptyParams, searchParams))
         parameterMap = {keys[i]: status[i] for i in range(len(keys))}
@@ -242,8 +344,11 @@ def search():
         song2 = "%" + song + "%"
         artistFName2 = "%" + artistFName + "%"
         artistLName2 = "%" + artistLName + "%"
-        #album = "%" + album + "%"
-        query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2)
+        album = "%" + album + "%"
+        genre = "%" + genre + "%"
+        # if rating is not None:
+        #     ratingVal = int(rating)
+        query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2, album, rating, genre)
         print(query)
         cursor.execute(query[0], query[1])
         conn.commit()
