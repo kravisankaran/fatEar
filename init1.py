@@ -414,7 +414,6 @@ def friend():
     return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
-# does not handle duplicated requests yet!
 @app.route("/friendUser", methods=["POST"])
 @login_required
 def friendUser():
@@ -492,7 +491,6 @@ def decline(username):
     return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
-# does not check if users are actually friends 
 @app.route("/unfriend", methods=["POST"])
 def unfriend():
     request_data = fetchFriendRequests()
