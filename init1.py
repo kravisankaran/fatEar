@@ -5,7 +5,7 @@ from datetime import datetime
 from functools import wraps
 
 import pymysql.cursors
-from flask import render_template, request, session, url_for, redirect
+from flask import render_template, request, session, url_for, redirect, jsonify
 
 # for uploading photo:
 from app import app
@@ -921,6 +921,59 @@ def review_album():
 
 
 @login_required
+@app.route("/updateReviewAlbum", methods=["POST"])
+def update_review_album():
+    cursor = conn.cursor()
+    album_id = request.form['album_id']
+    new_review_text = request.form['new_review_text'].strip()
+    user_id = session['username']
+    review_date = datetime.now()
+
+    # Check if the input field is empty
+    if not new_review_text:
+        return redirect(url_for('fetchList', error_empty_album_review=album_id))
+
+    # Check if the user has already posted a review for the album
+    check_query = "SELECT * FROM reviewAlbum WHERE albumID = %s AND username = %s;"
+    cursor.execute(check_query, (album_id, user_id))
+    existing_review = cursor.fetchone()
+    if not existing_review:
+        cursor.close()
+        return redirect(url_for('fetchList', error_no_existing_review=album_id))
+
+    # Update review in the database
+    update_query = "UPDATE reviewAlbum SET reviewText = %s, reviewDate = %s WHERE albumID = %s AND username = %s;"
+    cursor.execute(update_query, (new_review_text, review_date, album_id, user_id))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))  # Redirect back to the list page
+
+
+@app.route("/deleteReviewAlbum", methods=["POST"])
+@login_required
+def delete_review_album():
+    cursor = conn.cursor()
+    user_id = session['username']
+    album_id = request.form['album_id']
+
+    # Check if the user has posted a review for the album
+    check_query = "SELECT * FROM reviewAlbum WHERE albumID = %s AND username = %s;"
+    cursor.execute(check_query, (album_id, user_id))
+    existing_review = cursor.fetchone()
+
+    if existing_review:
+        # Delete the review from the database
+        delete_query = "DELETE FROM reviewAlbum WHERE albumID = %s AND username = %s;"
+        cursor.execute(delete_query, (album_id, user_id))
+        conn.commit()
+
+    cursor.close()
+
+    return jsonify(success=True)  # Return a success response
+
+
+@login_required
 @app.route("/reviewSong", methods=["POST"])
 def review_song():
     cursor = conn.cursor()
@@ -948,6 +1001,59 @@ def review_song():
     cursor.close()
 
     return redirect(url_for('fetchList'))
+
+
+@login_required
+@app.route("/updateReviewSong", methods=["POST"])
+def update_review_song():
+    cursor = conn.cursor()
+    song_id = request.form['song_id']
+    new_review_text = request.form['new_review_text'].strip()
+    user_id = session['username']
+    review_date = datetime.now()
+
+    # Check if the input field is empty
+    if not new_review_text:
+        return redirect(url_for('fetchList', error_empty_song_review=song_id))
+
+    # Check if the user has already posted a review for the album
+    check_query = "SELECT * FROM reviewSong WHERE songID = %s AND username = %s;"
+    cursor.execute(check_query, (song_id, user_id))
+    existing_review = cursor.fetchone()
+    if not existing_review:
+        cursor.close()
+        return redirect(url_for('fetchList', error_no_existing_review=song_id))
+
+    # Update review in the database
+    update_query = "UPDATE reviewSong SET reviewText = %s, reviewDate = %s WHERE songID = %s AND username = %s;"
+    cursor.execute(update_query, (new_review_text, review_date, song_id, user_id))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))  # Redirect back to the list page
+
+
+@app.route("/deleteReviewSong", methods=["POST"])
+@login_required
+def delete_review_song():
+    cursor = conn.cursor()
+    user_id = session['username']
+    song_id = request.form['song_id']
+
+    # Check if the user has posted a review for the album
+    check_query = "SELECT * FROM reviewSong WHERE songID = %s AND username = %s;"
+    cursor.execute(check_query, (song_id, user_id))
+    existing_review = cursor.fetchone()
+
+    if existing_review:
+        # Delete the review from the database
+        delete_query = "DELETE FROM reviewSong WHERE songID = %s AND username = %s;"
+        cursor.execute(delete_query, (song_id, user_id))
+        conn.commit()
+
+    cursor.close()
+
+    return jsonify(success=True)  # Return a success response
 
 
 @login_required
@@ -983,6 +1089,61 @@ def rate_album():
 
 
 @login_required
+@app.route("/updateRateAlbum", methods=["POST"])
+def update_rate_album():
+    cursor = conn.cursor()
+    album_id = request.form['album_id']
+    rating = int(request.form['rating'])
+    user_id = session['username']
+
+    # Check if the input field is empty
+    if rating == 0:
+        return redirect(url_for('fetchList', error_empty_album_rating=album_id))
+
+    # Check if the user already posted a rating for the album
+    check_query = "SELECT * FROM rateAlbum WHERE albumID = %s AND username = %s;"
+    cursor.execute(check_query, (album_id, user_id))
+    existing_rating = cursor.fetchone()
+
+    if not existing_rating:
+        cursor.close()
+        return redirect(url_for('fetchList', error_no_existing_rating=album_id))
+
+    # Update rating in the database
+    update_query = "UPDATE rateAlbum SET stars = %s WHERE albumID = %s AND username = %s;"
+    cursor.execute(update_query, (rating, album_id, user_id))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))
+
+
+@login_required
+@app.route("/deleteRateAlbum", methods=["POST"])
+def delete_rate_album():
+    cursor = conn.cursor()
+    album_id = request.form['album_id']
+    user_id = session['username']
+
+    # Check if the user has posted a rating for the album
+    check_query = "SELECT * FROM rateAlbum WHERE albumID = %s AND username = %s;"
+    cursor.execute(check_query, (album_id, user_id))
+    existing_rating = cursor.fetchone()
+
+    if not existing_rating:
+        cursor.close()
+        return redirect(url_for('fetchList', error_no_existing_rating=album_id))
+
+    # Delete rating from the database
+    delete_query = "DELETE FROM rateAlbum WHERE albumID = %s AND username = %s;"
+    cursor.execute(delete_query, (album_id, user_id))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))
+
+
+@login_required
 @app.route("/rateSong", methods=["POST"])
 def rate_song():
     cursor = conn.cursor()
@@ -1006,6 +1167,61 @@ def rate_song():
     # Save rating in the database
     save_query = "INSERT INTO rateSong (songID, username, stars, ratingDate) VALUES (%s, %s, %s, %s);"
     cursor.execute(save_query, (song_id, user_id, rating, rate_date))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))
+
+
+@login_required
+@app.route("/updateRateSong", methods=["POST"])
+def update_rate_song():
+    cursor = conn.cursor()
+    song_id = request.form['song_id']
+    rating = int(request.form['rating'])
+    user_id = session['username']
+
+    # Check if the input field is empty
+    if rating == 0:
+        return redirect(url_for('fetchList', error_empty_song_rating=song_id))
+
+    # Check if the user already posted a rating for the song
+    check_query = "SELECT * FROM rateSong WHERE songID = %s AND username = %s;"
+    cursor.execute(check_query, (song_id, user_id))
+    existing_rating = cursor.fetchone()
+
+    if not existing_rating:
+        cursor.close()
+        return redirect(url_for('fetchList', error_no_existing_rating=song_id))
+
+    # Update rating in the database
+    update_query = "UPDATE rateSong SET stars = %s WHERE songID = %s AND username = %s;"
+    cursor.execute(update_query, (rating, song_id, user_id))
+    conn.commit()
+    cursor.close()
+
+    return redirect(url_for('fetchList'))
+
+
+@login_required
+@app.route("/deleteRateSong", methods=["POST"])
+def delete_rate_song():
+    cursor = conn.cursor()
+    song_id = request.form['song_id']
+    user_id = session['username']
+
+    # Check if the user has posted a rating for the song
+    check_query = "SELECT * FROM songAlbum WHERE songID = %s AND username = %s;"
+    cursor.execute(check_query, (song_id, user_id))
+    existing_rating = cursor.fetchone()
+
+    if not existing_rating:
+        cursor.close()
+        return redirect(url_for('fetchList', error_no_existing_rating=song_id))
+
+    # Delete rating from the database
+    delete_query = "DELETE FROM songAlbum WHERE songID = %s AND username = %s;"
+    cursor.execute(delete_query, (song_id, user_id))
     conn.commit()
     cursor.close()
 
