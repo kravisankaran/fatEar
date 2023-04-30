@@ -1,4 +1,4 @@
-// ALBUM RATING
+// UPDATE ALBUM RATING
 $(document).ready(function () {
     $('button.album-rating-edit').click(function () {
         var ratingCell = $(this).parent().prev(); // Gets the previous div of the buttons div
@@ -74,8 +74,43 @@ $(document).ready(function () {
                     location.reload();
                 }
             });
-
-
         }
     });
 });
+
+// DELETE ALBUM RATING
+$(document).on('click', '.album-rating-delete', function () {
+    var album_id = $(this).closest('.card').find('.hidden-album-id').first().val();
+    var ratingCell = $(this).parent().prev();
+    
+    var user_id = $('body').data('user-id');
+    console.log("userId ", user_id);
+
+    $.ajax({
+        url: "/deleteRateAlbum",
+        type: "POST",
+        data: {
+            'album_id': album_id
+        },
+        success: function () {
+            alert('Successfully deleted rating!');
+            location.reload();
+        },
+        error: function () {
+            alert('There was an error deleting the rating.');
+            location.reload();
+        }
+    });
+});
+
+// UPDATE SONG RATING
+
+// DELETE SONG RATING
+
+// UPDATE ALBUM REVIEW
+
+// DELETE ALBUM REVIEW
+
+// UPDATE SONG REVIEW
+
+// DELETE SONG REVIEW
