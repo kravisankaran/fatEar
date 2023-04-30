@@ -1211,7 +1211,7 @@ def delete_rate_song():
     user_id = session['username']
 
     # Check if the user has posted a rating for the song
-    check_query = "SELECT * FROM songAlbum WHERE songID = %s AND username = %s;"
+    check_query = "SELECT * FROM rateSong WHERE songID = %s AND username = %s;"
     cursor.execute(check_query, (song_id, user_id))
     existing_rating = cursor.fetchone()
 
@@ -1220,7 +1220,7 @@ def delete_rate_song():
         return redirect(url_for('fetchList', error_no_existing_rating=song_id))
 
     # Delete rating from the database
-    delete_query = "DELETE FROM songAlbum WHERE songID = %s AND username = %s;"
+    delete_query = "DELETE FROM rateSong WHERE songID = %s AND username = %s;"
     cursor.execute(delete_query, (song_id, user_id))
     conn.commit()
     cursor.close()

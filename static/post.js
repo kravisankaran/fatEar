@@ -81,7 +81,6 @@ $(document).ready(function () {
 // DELETE ALBUM RATING
 $(document).on('click', '.album-rating-delete', function () {
     var album_id = $(this).closest('.card').find('.hidden-album-id').first().val();
-    var ratingCell = $(this).parent().prev();
 
     var user_id = $('body').data('user-id');
     console.log("userId ", user_id);
@@ -184,6 +183,29 @@ $(document).ready(function () {
 });
 
 // DELETE SONG RATING
+$(document).on('click', '.song-rating-delete', function () {
+    var song_id = $(this).closest('.card').find('.hidden-song-id').first().val();
+
+    var user_id = $('body').data('user-id');
+    console.log("userId ", user_id);
+    console.log("song_id ", song_id);
+
+    $.ajax({
+        url: "/deleteRateSong",
+        type: "POST",
+        data: {
+            'song_id': song_id
+        },
+        success: function () {
+            alert('Successfully deleted rating!');
+            location.reload();
+        },
+        error: function () {
+            alert('There was an error deleting the rating.');
+            location.reload();
+        }
+    });
+});
 
 // UPDATE ALBUM REVIEW
 
