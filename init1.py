@@ -5,9 +5,7 @@ from datetime import datetime
 from functools import wraps
 
 import pymysql.cursors
-
 from flask import render_template, request, session, url_for, redirect
-
 
 # for uploading photo:
 from app import app
@@ -54,6 +52,8 @@ def checkPlaylistExists(username, playlistName):
         cursor.execute(query)
     result = cursor.fetchall()
     return result
+
+
 # def allowed_image(filename):
 
 #     if not "." in filename:
@@ -181,138 +181,171 @@ def home():
 
 
 def _checkEmptyParams(x):
-   if x == "":
-      return 0
-   else:
-      return 1
-   
+    if x == "":
+        return 0
+    else:
+        return 1
+
+
 def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
     if x['s'] and x['a'] and x['f'] and x['l'] and x['r']:
         print('song, album, fname, lname, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s and rat.stars = %s", (song, fname, lname, album, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s and rat.stars = %s", (
+            song, fname, lname, album, ratingVal)
 
     elif x['s'] and x['a'] and x['f'] and x['l']:
         print('song, fname, lastname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s", (song, fname, lname, album)
-    
-    elif x['s'] and x['a'] and x['r'] and x['f']: 
-        print('song, album, rating, fname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s  and alb.albumName like %s and rat.stars = %s", (song, fname, album, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s", (
+            song, fname, lname, album)
 
-    elif x['s'] and x['a'] and x['r'] and x['l']: 
+    elif x['s'] and x['a'] and x['r'] and x['f']:
+        print('song, album, rating, fname present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s  and alb.albumName like %s and rat.stars = %s", (
+            song, fname, album, ratingVal)
+
+    elif x['s'] and x['a'] and x['r'] and x['l']:
         print('song, album, rating, lname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s and rat.stars = %s", (song, lname, album, ratingVal)
-    
-    elif x['f'] and x['a'] and x['r'] and x['l']: 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s and rat.stars = %s", (
+            song, lname, album, ratingVal)
+
+    elif x['f'] and x['a'] and x['r'] and x['l']:
         print('fname, lname, album, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where a.fname like %s and a.lname like %s  and alb.albumName like %s and rat.stars = %s", (fname, lname, album, ratingVal)
-   
-    elif x['f'] and x['s'] and x['r'] and x['l']: 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where a.fname like %s and a.lname like %s  and alb.albumName like %s and rat.stars = %s", (
+            fname, lname, album, ratingVal)
+
+    elif x['f'] and x['s'] and x['r'] and x['l']:
         print('song, fname, lname, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and rat.stars = %s", (song, fname, lname, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and a.lname like %s and rat.stars = %s", (
+            song, fname, lname, ratingVal)
 
     elif x['s'] and x['f'] and x['a']:
         print('song, fname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and alb.albumName like %s", (song, fname, album)
-   
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and alb.albumName like %s", (
+            song, fname, album)
+
     elif x['s'] and x['f'] and x['r']:
         print('song, fname, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and rat.stars = %s", (song, fname, ratingVal)
-    
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.fname like %s and rat.stars = %s", (
+            song, fname, ratingVal)
+
     elif x['s'] and x['l'] and x['a']:
         print('song, lname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s", (song, lname, album)
-    
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s", (
+            song, lname, album)
+
     elif x['s'] and x['l'] and x['r']:
         print('song, lname, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s and rat.stars = %s", (song, lname, ratingVal)
-    
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where title like %s and a.lname like %s and rat.stars = %s", (
+            song, lname, ratingVal)
+
     elif x['f'] and x['l'] and x['a']:
         print('fname, lname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s and alb.albumName like %s", (fname, lname, album)
-    
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s and alb.albumName like %s", (
+            fname, lname, album)
+
     elif x['f'] and x['l'] and x['r']:
         print('fname, lname, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s and rat.stars = %s", (fname, lname, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s and rat.stars = %s", (
+            fname, lname, ratingVal)
 
     elif x['a'] and x['l'] and x['r']:
         print('lname ,album, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and alb.albumName like %s and rat.stars = %s", (lname, album, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and alb.albumName like %s and rat.stars = %s", (
+            lname, album, ratingVal)
 
     elif x['a'] and x['f'] and x['r']:
         print('fname, album, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and alb.albumName like %s and rat.stars = %s", (fname, album, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and alb.albumName like %s and rat.stars = %s", (
+            fname, album, ratingVal)
 
     elif x['a'] and x['s'] and x['r']:
         print('song, album, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and alb.albumName like %s and rat.stars = %s", (song, album, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and alb.albumName like %s and rat.stars = %s", (
+            song, album, ratingVal)
 
-    elif x['s'] and x['f'] and x['l'] :
-        print ('song, artist fname, artist lname are present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.fname like %s and a.lname like %s", (song, fname, lname)
-    
-    
-    elif x['s'] and x['f'] :
+    elif x['s'] and x['f'] and x['l']:
+        print('song, artist fname, artist lname are present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.fname like %s and a.lname like %s", (
+            song, fname, lname)
+
+
+    elif x['s'] and x['f']:
         print('song and artist fname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.fname like %s", (song,fname)
-    
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.fname like %s", (
+            song, fname)
+
     elif x['s'] and x['l']:
-        print ('song and artist lname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.lname like %s", (song,lname)
+        print('song and artist lname present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and a.lname like %s", (
+            song, lname)
 
     elif x['f'] and x['l']:
         print('artist fname and lname present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s", (fname, lname)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and a.lname like %s", (
+            fname, lname)
 
     elif x['f'] and x['a']:
-        print ('artist fname and album name present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and alb.albumName like %s", (fname, album)
-    
+        print('artist fname and album name present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and alb.albumName like %s", (
+            fname, album)
+
     elif x['l'] and x['a']:
-        print ('artist fname and album name present') 
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and alb.albumName like %s", (lname, album)
-    
+        print('artist fname and album name present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and alb.albumName like %s", (
+            lname, album)
+
     elif x['s'] and x['a']:
-        print ('song and album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and alb.albumName like %s", (song, album)
-    
+        print('song and album present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and alb.albumName like %s", (
+            song, album)
+
     elif x['s'] and x['r']:
-        print('song and rating present') 
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and rat.stars like %s", (song, ratingVal)
+        print('song and rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where title like %s and rat.stars like %s", (
+            song, ratingVal)
 
     elif x['a'] and x['r']:
         print('album and rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where alb.albumName like %s and rat.stars like %s", (album, ratingVal)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where alb.albumName like %s and rat.stars like %s", (
+            album, ratingVal)
 
     elif x['f'] and x['r']:
-        print('fname and rating present')   
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and rat.stars like %s", (fname, ratingVal)
+        print('fname and rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s and rat.stars like %s", (
+            fname, ratingVal)
 
     elif x['l'] and x['r']:
-        print('lname and rating present') 
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and rat.stars like %s", (lname, ratingVal)
+        print('lname and rating present')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s and rat.stars like %s", (
+            lname, ratingVal)
 
     elif x['f']:
-        print ('only firstname')
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (fname)
+        print('only firstname')
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.fname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (
+            fname)
 
     elif x['l']:
-        print ('only lastname')
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (lname)
+        print('only lastname')
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (
+            lname)
 
     elif x['s']:
-        print ('only song')
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a   where title like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (song)
+        print('only song')
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a   where title like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (
+            song)
     elif x['a']:
-        print ('only album')
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (album)
-    
+        print('only album')
+        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a  where alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL", (
+            album)
+
     elif x['r']:
-        print ('only rating')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where rat.stars like %s", (ratingVal)
+        print('only rating')
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join artist a where rat.stars like %s", (
+            ratingVal)
 
     else:
-       print('nothing was picked')
+        print('nothing was picked')
+
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -331,16 +364,16 @@ def search():
         print(album)
         print(rating)
         print(genre)
-       
+
         cursor = conn.cursor()
         # song, artistF, artistLast, album
         searchParams = [song, artistFName, artistLName, album, rating, genre]
         keys = ["s", "f", "l", "a", "r", "g"]
-        
+
         status = list(map(_checkEmptyParams, searchParams))
         parameterMap = {keys[i]: status[i] for i in range(len(keys))}
         print(parameterMap)
-        
+
         song2 = "%" + song + "%"
         artistFName2 = "%" + artistFName + "%"
         artistLName2 = "%" + artistLName + "%"
@@ -357,6 +390,7 @@ def search():
 
     return render_template('search.html')
 
+
 @app.route('/playlist', methods=['GET', 'POST'])
 def addPlaylist():
     if request.method == "POST":
@@ -366,7 +400,7 @@ def addPlaylist():
         description = request.form['description']
         creationDate = str(datetime.now())
         song = request.form['song']
-        
+
         print(playlistName)
         print(song)
         print(userName)
@@ -375,16 +409,18 @@ def addPlaylist():
         cursor = conn.cursor()
         # song, artistF, artistLast, album
         print("Creating new entry in Playlist Table")
-        cursor.execute("INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)", (userName, playlistName, description, creationDate))
-        cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)", (userName, playlistName, song))
+        cursor.execute(
+            "INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)",
+            (userName, playlistName, description, creationDate))
+        cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)",
+                       (userName, playlistName, song))
         conn.commit()
         cursor.execute("select * from songsInPlaylist")
         data = cursor.fetchall()
         print(data)
         return render_template('playlist.html', data=data)
-       
-    return render_template('playlist.html')
 
+    return render_template('playlist.html')
 
 
 # friend
@@ -432,10 +468,11 @@ def friendUser():
             try:
                 cursor1 = conn.cursor()
                 statusQuery = "SELECT acceptStatus FROM friend WHERE (user1 = %s AND user2 = %s) OR (user2 = %s AND user1 = %s)"
-                cursor1.execute(statusQuery, (username_friended, username_requester, username_friended, username_requester))
+                cursor1.execute(statusQuery,
+                                (username_friended, username_requester, username_friended, username_requester))
                 friendStatus = cursor1.fetchall()
                 cursor1.close()
-                
+
                 # check if user 1 and 2 are already friends, or if there's already a pending request
                 if len(friendStatus) > 0:
                     if friendStatus[0].get("acceptStatus") == "accepted":
@@ -447,7 +484,7 @@ def friendUser():
                     cursor = conn.cursor()
                     query = "INSERT INTO friend VALUES (%s, %s, %s, %s, %s, %s)"
                     cursor.execute(query, (username_friended, username_requester, acceptStatus, username_requester,
-                                        time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S')))
+                                           time.strftime('%Y-%m-%d %H:%M:%S'), time.strftime('%Y-%m-%d %H:%M:%S')))
                     conn.commit()
                     cursor.close()
                     message = "Request sent to %s." % (username_friended)
@@ -458,7 +495,7 @@ def friendUser():
         else:
             message = "%s does not exist." % (username_friended)
     return render_template("friend.html", message=message, username=session["username"],
-                                   friendRequests=request_data, allFriends=allf_data)
+                           friendRequests=request_data, allFriends=allf_data)
 
 
 @login_required
@@ -514,7 +551,7 @@ def unfriend():
                 cursor1.execute(statusQuery, (currentUser, to_unfriend, currentUser, to_unfriend))
                 friendStatus = cursor1.fetchall()
                 cursor1.close()
-                
+
                 # check if user 1 and 2 are currently friends
                 if len(friendStatus) > 0 and friendStatus[0].get("acceptStatus") == "accepted":
                     cursor1 = conn.cursor()
@@ -524,8 +561,8 @@ def unfriend():
                     cursor1.close()
 
                     # doesn't instantly update, have to refresh
-                    message = "Successfully removed friend, refresh to see current friend list" 
-                else: 
+                    message = "Successfully removed friend, refresh to see current friend list"
+                else:
                     message = "You and %s are not friends" % (to_unfriend)
             except:
                 message = "Failed to unfriend " + to_unfriend
@@ -547,6 +584,7 @@ def fetchFollowing():
     cursor.execute(query, (user))
     return cursor.fetchall()
 
+
 @login_required
 def fetchFollower():
     cursor = conn.cursor()
@@ -555,19 +593,21 @@ def fetchFollower():
     cursor.execute(query, (user))
     return cursor.fetchall()
 
+
 @app.route("/follow", methods=["GET"])
 @login_required
 def follow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
-    return render_template("follow.html",  allFollowing=allf_data, allFollower=followersData)
+    return render_template("follow.html", allFollowing=allf_data, allFollower=followersData)
+
 
 @app.route("/followUser", methods=["POST"])
 @login_required
 def followUser():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
-    
+
     if request.form:
         requestData = request.form
         username_following = requestData["username_following"]
@@ -575,28 +615,30 @@ def followUser():
         if checkUserExist(username_following):
             if username_following == username_follower:
                 message = "You cannot follow yourself!"
-                return render_template("follow.html", message=message, allFollowing=allf_data, allFollower=followersData)
+                return render_template("follow.html", message=message, allFollowing=allf_data,
+                                       allFollower=followersData)
             try:
                 cursor1 = conn.cursor()
                 statusQuery = "SELECT follows as myFollowing FROM follows WHERE follower=%s and follows=%s"
                 cursor1.execute(statusQuery, (username_follower, username_following))
                 followStatus = cursor1.fetchall()
                 cursor1.close()
-                
+
                 # check if user already follows the other user
                 if len(followStatus) > 0:
                     message = "You are already follow %s." % (username_following)
                 else:
                     cursor = conn.cursor()
                     query = "INSERT INTO follows VALUES (%s, %s, %s)"
-                    cursor.execute(query, (username_follower,username_following, time.strftime('%Y-%m-%d %H:%M:%S')))
+                    cursor.execute(query, (username_follower, username_following, time.strftime('%Y-%m-%d %H:%M:%S')))
                     conn.commit()
                     cursor.close()
                     message = "You are now following %s, refresh to see current following list" % (username_following)
 
             except:
                 message = "An error has occurred. Please try again."
-                return render_template("follow.html", allFollowing=allf_data, allFollower=followersData, message=message)
+                return render_template("follow.html", allFollowing=allf_data, allFollower=followersData,
+                                       message=message)
         else:
             message = "%s does not exist." % (username_following)
     return render_template("follow.html", allFollowing=allf_data, allFollower=followersData, message=message)
@@ -623,7 +665,7 @@ def unfollow():
                 cursor1.execute(statusQuery, (currentUser, to_unfollow))
                 followStatus = cursor1.fetchall()
                 cursor1.close()
-                
+
                 # check if user is currently following the other user
                 if len(followStatus) > 0:
                     cursor1 = conn.cursor()
@@ -633,8 +675,8 @@ def unfollow():
                     cursor1.close()
 
                     # doesn't instantly update, have to refresh
-                    message = "Successfully unfollowed, refresh to see current following list" 
-                else: 
+                    message = "Successfully unfollowed, refresh to see current following list"
+                else:
                     message = "You are not following %s" % (to_unfollow)
             except:
                 message = "Failed to unfollow " + to_unfollow
@@ -667,7 +709,7 @@ def removeFollow():
                 cursor1.execute(statusQuery, (currentUser, to_remove))
                 followStatus = cursor1.fetchall()
                 cursor1.close()
-                
+
                 # check if the to-be-removed user is currently following the loggedin user
                 if len(followStatus) > 0:
                     cursor1 = conn.cursor()
@@ -677,8 +719,8 @@ def removeFollow():
                     cursor1.close()
 
                     # doesn't instantly update, have to refresh
-                    message = "Successfully removed follower, refresh to see current following list" 
-                else: 
+                    message = "Successfully removed follower, refresh to see current following list"
+                else:
                     message = "%s is not your follower" % (to_remove)
             except:
                 message = "Failed to remove " + to_remove
@@ -690,20 +732,29 @@ def removeFollow():
                            allFollowing=allf_data, allFollower=followersData)
 
 
-
-
-# post 
+# post
 
 @login_required
-@app.route("/post", methods=["GET"])
+@app.route("/post", methods=['GET'])
 def fetchList():
     # Fetch all data from song, album, artist tables
     user_id = session['username']
     cursor = conn.cursor()
-    query = " SELECT s.songID,s.title, sIA.albumID, a.artistID, a.fname, a.lname FROM song s JOIN artistPerformsSong aPS on s.songID = aPS.songID JOIN artist a on a.artistID = aPS.artistID JOIN songInAlbum sIA on s.songID = sIA.songID;"
-    cursor.execute(query)
+    query = """
+     SELECT s.songID,s.title, sIA.albumID, al.albumName, a.artistID, a.fname, a.lname, 
+        CASE 
+            WHEN uf.username IS NULL THEN false
+            ELSE true
+        END as is_fan
+        FROM song s 
+        JOIN artistPerformsSong aPS on s.songID = aPS.songID 
+        JOIN artist a on a.artistID = aPS.artistID 
+        JOIN songInAlbum sIA on s.songID = sIA.songID 
+        JOIN album al on al.albumID = sIA.albumId
+        LEFT JOIN userFanOfArtist uf on uf.artistID = a.artistID and uf.username = %s;
+    """
+    cursor.execute(query, (user_id))
     list = cursor.fetchall()
-    cursor.close()
 
     # Error - Review
     error_duplicate_song_review = request.args.get('error_duplicate_song_review')
@@ -724,6 +775,76 @@ def fetchList():
     # Fetch all data from review, rate, fan tables
     review_album_data, review_song_data, rating_album_data, rating_song_data, fan_data = fetchPost()
 
+    # Combine review and rating data to show these two together
+    combined_song = []
+    combined_album = []
+
+    cursor.execute("SELECT * FROM user")
+    users = cursor.fetchall()
+    cursor.execute("SELECT * FROM song")
+    songs = cursor.fetchall()
+    cursor.execute("SELECT * FROM album")
+    albums = cursor.fetchall()
+    cursor.close()
+
+    total_fans = {}
+    total_song_reviews = {}
+    total_album_reviews = {}
+    average_song_ratings = {}
+    average_album_ratings = {}
+
+    for fan in fan_data:
+        artist_id = fan['artistID']
+        if artist_id in total_fans:
+            total_fans[artist_id] += 1
+        else:
+            total_fans[artist_id] = 1
+
+    for user in users:
+        for song in songs:
+            song_id = song['songID']
+            user_song_data = {'username': user['username'], 'songID': song['songID']}
+            song_reviews = [review for review in review_song_data if review['songID'] == song_id]
+            total_song_reviews[song_id] = len(song_reviews)
+
+            song_ratings = [rating['stars'] for rating in rating_song_data if rating['songID'] == song_id]
+            average_song_ratings[song_id] = "{:.2f}".format(
+                sum(song_ratings) / len(song_ratings)) if song_ratings else "0"
+
+            for review in song_reviews:
+                if review['username'] == user['username']:
+                    user_song_data['review'] = review['reviewText']
+
+            for rating in rating_song_data:
+                if rating['songID'] == song_id and rating['username'] == user['username']:
+                    user_song_data['rating'] = rating['stars']
+
+            # Only append to combined_song if there's a review or rating
+            if 'review' in user_song_data or 'rating' in user_song_data:
+                combined_song.append(user_song_data)
+
+        for album in albums:
+            album_id = album['albumID']
+            user_album_data = {'username': user['username'], 'albumID': album['albumID']}
+            album_reviews = [review for review in review_album_data if review['albumID'] == album_id]
+            total_album_reviews[album_id] = len(album_reviews)
+
+            album_ratings = [rating['stars'] for rating in rating_album_data if rating['albumID'] == album_id]
+            average_album_ratings[album_id] = "{:.2f}".format(
+                sum(album_ratings) / len(album_ratings)) if album_ratings else "0"
+
+            for review in album_reviews:
+                if review['username'] == user['username']:
+                    user_album_data['review'] = review['reviewText']
+
+            for rating in rating_album_data:
+                if rating['albumID'] == album_id and rating['username'] == user['username']:
+                    user_album_data['rating'] = rating['stars']
+
+            # Only append to combined_album if there's a review or rating
+            if 'review' in user_album_data or 'rating' in user_album_data:
+                combined_album.append(user_album_data)
+
     return render_template("post.html",
                            list=list,
                            user_id=user_id,
@@ -741,7 +862,14 @@ def fetchList():
                            review_song_data=review_song_data,
                            rating_album_data=rating_album_data,
                            rating_song_data=rating_song_data,
-                           fan_data=fan_data
+                           fan_data=fan_data,
+                           total_fans=total_fans,
+                           combined_song=combined_song,
+                           combined_album=combined_album,
+                           total_song_reviews=total_song_reviews,
+                           total_album_reviews=total_album_reviews,
+                           average_song_ratings=average_song_ratings,
+                           average_album_ratings=average_album_ratings
                            )
 
 
@@ -897,21 +1025,22 @@ def fan_of_artist():
     check_query = "SELECT * FROM userFanOfArtist WHERE username = %s AND artistID = %s;"
     cursor.execute(check_query, (user_id, artist_id))
     result = cursor.fetchone()
+    print(result)
 
     if is_fan:
         # Insert fan relationship in the database only if not already a fan
         if not result:
-            save_query = "INSERT INTO userFanOfArtist (username, artistID) VALUES (%s, %s);"
-            cursor.execute(save_query, (user_id, artist_id))
+            save_query = "INSERT INTO userFanOfArtist (username, artistID, fanAt) VALUES (%s, %s, %s);"
+            cursor.execute(save_query, (user_id, artist_id, time.strftime('%Y-%m-%d %H:%M:%S')))
         else:
-            error_fan = "You are already a fan of this artist."
+            error_fan = "Please refresh your browser."
     else:
         # Remove fan relationship from the database only if user is a fan
         if result:
             delete_query = "DELETE FROM userFanOfArtist WHERE username = %s AND artistID = %s;"
             cursor.execute(delete_query, (user_id, artist_id))
         else:
-            error_fan = "You are not a fan of this artist."
+            error_fan = "Check the box and click the button."
 
     conn.commit()
     cursor.close()
