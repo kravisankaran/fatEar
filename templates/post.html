@@ -230,6 +230,9 @@
 
                                                     <div>
                                                         {% if song_data.username == user_id %}
+                                                            <input type="hidden" name="song_id"
+                                                                   value="{{ song_data.songID }}"
+                                                                   class="hidden-song-id">
                                                             <button type="button"
                                                                     class="song-rating-edit btn btn-link text-warning"
                                                                     style="padding: 0">Edit
