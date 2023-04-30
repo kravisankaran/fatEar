@@ -923,31 +923,35 @@ def review_album():
 @login_required
 @app.route("/updateReviewAlbum", methods=["POST"])
 def update_review_album():
-    cursor = conn.cursor()
-    album_id = request.form['album_id']
-    new_review_text = request.form['new_review_text'].strip()
-    user_id = session['username']
-    review_date = datetime.now()
+    try:
+        cursor = conn.cursor()
+        album_id = request.form['album_id']
+        new_review_text = request.form['new_review_text'].strip()
+        user_id = session['username']
+        review_date = datetime.now()
 
-    # Check if the input field is empty
-    if not new_review_text:
-        return redirect(url_for('fetchList', error_empty_album_review=album_id))
+        # Check if the input field is empty
+        if not new_review_text:
+            return redirect(url_for('fetchList', error_empty_album_review=album_id))
 
-    # Check if the user has already posted a review for the album
-    check_query = "SELECT * FROM reviewAlbum WHERE albumID = %s AND username = %s;"
-    cursor.execute(check_query, (album_id, user_id))
-    existing_review = cursor.fetchone()
-    if not existing_review:
+        # Check if the user has already posted a review for the album
+        check_query = "SELECT * FROM reviewAlbum WHERE albumID = %s AND username = %s;"
+        cursor.execute(check_query, (album_id, user_id))
+        existing_review = cursor.fetchone()
+        if not existing_review:
+            cursor.close()
+            return redirect(url_for('fetchList', error_no_existing_review=album_id))
+
+        # Update review in the database
+        update_query = "UPDATE reviewAlbum SET reviewText = %s, reviewDate = %s WHERE albumID = %s AND username = %s;"
+        cursor.execute(update_query, (new_review_text, review_date, album_id, user_id))
+        conn.commit()
         cursor.close()
-        return redirect(url_for('fetchList', error_no_existing_review=album_id))
 
-    # Update review in the database
-    update_query = "UPDATE reviewAlbum SET reviewText = %s, reviewDate = %s WHERE albumID = %s AND username = %s;"
-    cursor.execute(update_query, (new_review_text, review_date, album_id, user_id))
-    conn.commit()
-    cursor.close()
-
-    return redirect(url_for('fetchList'))  # Redirect back to the list page
+        return redirect(url_for('fetchList'))  # Redirect back to the list page
+    except Exception as e:
+        print(str(e))
+        return jsonify(success=False, error=str(e)), 400
 
 
 @app.route("/deleteReviewAlbum", methods=["POST"])

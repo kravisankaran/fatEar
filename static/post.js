@@ -21,12 +21,12 @@ $(document).ready(function () {
                   <option ${rating === 5 ? 'selected' : ''} value="5">5</option>
             </select>
 
-           <button type="button" class="save-updated-album-rating btn btn-link text-primary" style="padding: 0">Save</button>
+           <button type="button" class="album-rating-save btn btn-link text-primary" style="padding: 0">Save</button>
     `;
         ratingCell.html(selectHTML);
     });
 
-    $(document).on('click', '.save-updated-album-rating', function () {
+    $(document).on('click', '.album-rating-save', function () {
         var ratingCell = $(this).prev();
         var newRating = ratingCell.val(); // Get the new rating from the select menu
         console.log(newRating); // ok
@@ -125,12 +125,12 @@ $(document).ready(function () {
                   <option ${rating === 5 ? 'selected' : ''} value="5">5</option>
             </select>
 
-           <button type="button" class="save-updated-song-rating btn btn-link text-primary" style="padding: 0">Save</button>
+           <button type="button" class="song-rating-save btn btn-link text-primary" style="padding: 0">Save</button>
     `;
         ratingCell.html(selectHTML);
     });
 
-    $(document).on('click', '.save-updated-song-rating', function () {
+    $(document).on('click', '.song-rating-save', function () {
         var ratingCell = $(this).prev();
         var newRating = ratingCell.val(); // Get the new rating from the select menu
         console.log(newRating); // ok
@@ -208,7 +208,54 @@ $(document).on('click', '.song-rating-delete', function () {
 });
 
 // UPDATE ALBUM REVIEW
+$(document).ready(function () {
+    $(document).on('click', '.album-review-edit', function () {
+        var $this = $(this);
+        var $review = $this.parent().siblings('p');
+        var reviewText = $review.text();
+        var album_id = $(this).closest('.card').find('.hidden-album-id').val();
 
+        var user_id = $('body').data('user-id');
+        console.log(reviewText);
+        console.log(album_id);
+        console.log(user_id);
+
+        // Create a new input field with the current review text
+        var $newReview = $('<input type="text" placeholder={reviewText} class="form-control" value="' + reviewText + '">');
+        $review.replaceWith($newReview);
+
+        // Replace the edit and delete buttons with a save button
+        $this.hide();
+        $this.siblings('.album-review-delete').hide();
+        var $saveButton = $('<button type="button" class="album-review-save btn btn-link text-primary" style="padding: 0">Save</button>');
+        $this.after($saveButton);
+
+        // When the save button is clicked, send an AJAX request to update the review
+        $saveButton.on('click', function () {
+            var newReviewText = $newReview.val();
+            console.log(newReviewText);
+            $.ajax({
+                url: '/updateReviewAlbum',
+                method: 'POST',
+                data: {
+                    album_id: album_id,
+                    new_review_text: newReviewText,
+                    user_id: user_id
+                },
+                success: function (response) {
+                    // Replace the input field with the new review text
+                    $newReview.replaceWith('<p style="margin-bottom: 0rem">' + newReviewText + '</p>');
+                    alert('Successfully updated!');
+                    location.reload();
+                },
+                error: function (response) {
+                    alert('There was an error updating the review.');
+                    location.reload();
+                }
+            });
+        });
+    });
+});
 // DELETE ALBUM REVIEW
 
 // UPDATE SONG REVIEW

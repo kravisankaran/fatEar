@@ -267,6 +267,9 @@
                                     {% for album_data in combined_album %}
 
                                         {% if album_data.albumID == data.albumID %}
+                                            <input type="hidden" name="album_id"
+                                                   value="{{ album_data.albumID }}"
+                                                   class="hidden-album-id">
                                             <p style="margin-bottom: 0rem"><strong
                                                     class="{{ 'text-primary' if album_data.username == user_id }}">{{ album_data.username }}</strong>
                                             </p>
@@ -301,9 +304,7 @@
 
                                                     <div>
                                                         {% if album_data.username == user_id %}
-                                                            <input type="hidden" name="album_id"
-                                                                   value="{{ album_data.albumID }}"
-                                                                   class="hidden-album-id">
+
                                                             <button type="button"
                                                                     class="album-rating-edit btn btn-link text-warning"
                                                                     style="padding: 0">Edit
