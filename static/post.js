@@ -79,26 +79,28 @@ $(document).ready(function () {
 });
 
 // DELETE ALBUM RATING
-$(document).on('click', '.album-rating-delete', function () {
-    var album_id = $(this).closest('.card').find('.hidden-album-id').first().val();
+$(document).ready(function () {
+    $(document).on('click', '.album-rating-delete', function () {
+        var album_id = $(this).closest('.card').find('.hidden-album-id').first().val();
 
-    var user_id = $('body').data('user-id');
-    console.log("userId ", user_id);
+        var user_id = $('body').data('user-id');
+        console.log("userId ", user_id);
 
-    $.ajax({
-        url: "/deleteRateAlbum",
-        type: "POST",
-        data: {
-            'album_id': album_id
-        },
-        success: function () {
-            alert('Successfully deleted rating!');
-            location.reload();
-        },
-        error: function () {
-            alert('There was an error deleting the rating.');
-            location.reload();
-        }
+        $.ajax({
+            url: "/deleteRateAlbum",
+            type: "POST",
+            data: {
+                'album_id': album_id
+            },
+            success: function () {
+                alert('Successfully deleted rating!');
+                location.reload();
+            },
+            error: function () {
+                alert('There was an error deleting the rating.');
+                location.reload();
+            }
+        });
     });
 });
 
@@ -183,27 +185,29 @@ $(document).ready(function () {
 });
 
 // DELETE SONG RATING
-$(document).on('click', '.song-rating-delete', function () {
-    var song_id = $(this).closest('.card').find('.hidden-song-id').first().val();
+$(document).ready(function () {
+    $(document).on('click', '.song-rating-delete', function () {
+        var song_id = $(this).closest('.card').find('.hidden-song-id').first().val();
 
-    var user_id = $('body').data('user-id');
-    console.log("userId ", user_id);
-    console.log("song_id ", song_id);
+        var user_id = $('body').data('user-id');
+        console.log("userId ", user_id);
+        console.log("song_id ", song_id);
 
-    $.ajax({
-        url: "/deleteRateSong",
-        type: "POST",
-        data: {
-            'song_id': song_id
-        },
-        success: function () {
-            alert('Successfully deleted rating!');
-            location.reload();
-        },
-        error: function () {
-            alert('There was an error deleting the rating.');
-            location.reload();
-        }
+        $.ajax({
+            url: "/deleteRateSong",
+            type: "POST",
+            data: {
+                'song_id': song_id
+            },
+            success: function () {
+                alert('Successfully deleted rating!');
+                location.reload();
+            },
+            error: function () {
+                alert('There was an error deleting the rating.');
+                location.reload();
+            }
+        });
     });
 });
 
@@ -257,6 +261,37 @@ $(document).ready(function () {
     });
 });
 // DELETE ALBUM REVIEW
+$(document).ready(function () {
+    $(document).on('click', '.album-review-delete', function () {
+        var $this = $(this);
+        var album_id = $(this).closest('.card').find('.hidden-album-id').val();
+        var user_id = $('body').data('user-id');
+        console.log(album_id);
+        console.log(user_id);
+
+        if (confirm('Are you sure you want to delete this review?')) {
+            $.ajax({
+                url: '/deleteReviewAlbum',
+                method: 'POST',
+                data: {
+                    album_id: album_id,
+                    user_id: user_id
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Review successfully deleted!');
+                        location.reload();
+                    } else {
+                        alert('There was an error deleting the review.');
+                    }
+                },
+                error: function (response) {
+                    alert('There was an error deleting the review.');
+                }
+            });
+        }
+    });
+});
 
 // UPDATE SONG REVIEW
 
