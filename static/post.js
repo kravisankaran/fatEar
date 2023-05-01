@@ -218,21 +218,25 @@ $(document).ready(function () {
         var $review = $this.parent().siblings('p');
         var reviewText = $review.text();
         var album_id = $(this).closest('.card').find('.hidden-album-id').val();
-
         var user_id = $('body').data('user-id');
         console.log(reviewText);
         console.log(album_id);
         console.log(user_id);
 
         // Create a new input field with the current review text
-        var $newReview = $('<input type="text" placeholder={reviewText} class="form-control" value="' + reviewText + '">');
-        $review.replaceWith($newReview);
+        var $newReview = $('<input type="text" style="width: 100%" class="form-control" value="' + reviewText + '">');
 
         // Replace the edit and delete buttons with a save button
         $this.hide();
         $this.siblings('.album-review-delete').hide();
-        var $saveButton = $('<button type="button" class="album-review-save btn btn-link text-primary" style="padding: 0">Save</button>');
-        $this.after($saveButton);
+        var $saveButton = $('<button type="button" class="album-review-save btn btn-link text-primary" style="padding: 0; display: block;">Save</button>');
+
+        // Create a container for the new review input and the save button
+        var $container = $('<div></div>');
+        $container.append($newReview);
+        $container.append($saveButton);
+
+        $review.replaceWith($container);
 
         // When the save button is clicked, send an AJAX request to update the review
         $saveButton.on('click', function () {
@@ -248,7 +252,7 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     // Replace the input field with the new review text
-                    $newReview.replaceWith('<p style="margin-bottom: 0rem">' + newReviewText + '</p>');
+                    $container.replaceWith('<p style="margin-bottom: 0rem">' + newReviewText + '</p>');
                     alert('Successfully updated!');
                     location.reload();
                 },
@@ -344,3 +348,34 @@ $(document).ready(function () {
 });
 
 // DELETE SONG REVIEW
+$(document).ready(function () {
+    $(document).on('click', '.song-review-delete', function () {
+        var $this = $(this);
+        var song_id = $(this).closest('.card').find('.hidden-song-id').val();
+        var user_id = $('body').data('user-id');
+        console.log(song_id);
+        console.log(user_id);
+
+        if (confirm('Are you sure you want to delete this review?')) {
+            $.ajax({
+                url: '/deleteReviewSong',
+                method: 'POST',
+                data: {
+                    song_id: song_id,
+                    user_id: user_id
+                },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Review successfully deleted!');
+                        location.reload();
+                    } else {
+                        alert('There was an error deleting the review.');
+                    }
+                },
+                error: function (response) {
+                    alert('There was an error deleting the review.');
+                }
+            });
+        }
+    });
+});
