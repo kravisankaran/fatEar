@@ -31,6 +31,15 @@
             border: 1px solid black;
         }
     </style>
+    <style>
+        #rr-element {
+            white-space: nowrap;
+        }
+        
+        #rr-element label {
+           padding-left: 0.4em;
+        }
+    </style>
     <body>
         {% include 'common/navbar.html' %}
 	    <br>
@@ -38,30 +47,30 @@
         <div class="container-fluid">
             <h1><center>FatEar</center></h1>
             <form class="example" method="post" action="" style="margin:auto;max-width:1000px">
+                <br/>
                 <input type="text" placeholder="Name of Playlist" name="playlist">
-                <label for="song-choice"> Choose a Song </label>
-                <input list= "songs" id ="song-choice" name = "song">
-                <datalist id="songs">
+                <br/>
+                <a>
                     {%for row in songs%}
-                    <li>
-                     <option value="{{row.title}}">{{row.title}}</option>
-                    </li>
-                    <li class="divider"></li>
-                    {% endfor %}
-                </datalist>
-             
+                    <dd id="rr-element">
+                      <input type="checkbox" name="song-choice" value="{{row.title}}" id="flexCheckChecked">
+                      <label for="rr-1"> {{row.title}}</label>
+                    </dd>
+                    <br>
+                      {% endfor %}
+                  </a>
                 <input type="text" placeholder="Add Description" name ="description">
                 <button type="submit" <i>Insert</i></button>
                 </button>
             </form>
-            <p></p>
+            
             <center>
+              
             <table style="margin-left: 20px;">
-            {% for item in data %}  
+            
+            {% for item in data %} 
                 <tr>
-                    <td> {{item.playlistName}}</td> 
-
-                    <td> {{item.title}} </td>
+                    <td> {{item.title}} has been added to playlist {{item.playlistName}} </td>
                 </tr>
                 {% endfor %}
             </table>
