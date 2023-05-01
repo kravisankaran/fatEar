@@ -14,6 +14,32 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="/static/search.css">
     </head>
+    <style type="text/css">
+      
+        th:tr{
+            color: blue;
+      
+        }
+        tr:nth-of-type(2n){
+            border: 1px solid black;
+            background-color: rgba(150, 150, 150, 0.5);
+      
+        }
+      
+        td{
+            padding: 8px 8px;
+            border: 1px solid black;
+        }
+    </style>
+    <style>
+        #rr-element {
+            white-space: nowrap;
+        }
+        
+        #rr-element label {
+           padding-left: 0.4em;
+        }
+    </style>
     <body>
         {% include 'common/navbar.html' %}
 	    <br>
@@ -21,21 +47,38 @@
         <div class="container-fluid">
             <h1><center>FatEar</center></h1>
             <form class="example" method="post" action="" style="margin:auto;max-width:1000px">
+                <br/>
                 <input type="text" placeholder="Name of Playlist" name="playlist">
-                <input type="text" placeholder="Add Song" name ="song">
+                <br/>
+                <a>
+                    {%for row in songs%}
+                    <dd id="rr-element">
+                      <input type="checkbox" name="song-choice" value="{{row.title}}" id="flexCheckChecked">
+                      <label for="rr-1"> {{row.title}}</label>
+                    </dd>
+                    <br>
+                      {% endfor %}
+                  </a>
                 <input type="text" placeholder="Add Description" name ="description">
                 <button type="submit" <i>Insert</i></button>
                 </button>
             </form>
-            <p></p>
+            
             <center>
-            {% for item in data %}
+              
+            <table style="margin-left: 20px;">
+            
+            {% for item in data %} 
                 <tr>
-                    <td> {{item.username}} created a playlist {{item.playlistName}} with song {{item.songID}} </td>
-
-                    </br>
+                    <td> {{item.title}} has been added to playlist {{item.playlistName}} </td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
+            </table>
+            
+            </center>
+            {% if error %}
+				<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% endif %}
             </center>
         </div>
 

@@ -48,9 +48,26 @@ def checkUserExist(username):
 
 def checkPlaylistExists(username, playlistName):
     with conn.cursor() as cursor:
-        query = "SELECT * FROM playlist WHERE username = '%s' % (username) and playlistName = '%s' % (playlistName)"
+        query = "SELECT * FROM playlist WHERE username = '%s' and playlistName = '%s'" % (username, playlistName)
         cursor.execute(query)
     result = cursor.fetchall()
+    print ("result : %s", result)
+    return result
+
+def getSongIDFromSong(song):
+    with conn.cursor() as cursor:
+        query = "SELECT songID FROM song WHERE title = '%s'" % (song)
+        cursor.execute(query)
+    result = cursor.fetchall()
+    #print (result)
+    return result
+
+def getSongs():
+    with conn.cursor() as cursor:
+        query = "SELECT title FROM song"
+        cursor.execute(query)
+    result = cursor.fetchall()
+    print ("title", result)
     return result
 
 
@@ -390,38 +407,73 @@ def search():
 
     return render_template('search.html')
 
+def checkLength(field) :
+    l = len(field)
+    if l <=0 or l > 50 :
+        return 0
+    return 1
 
 @app.route('/playlist', methods=['GET', 'POST'])
 def addPlaylist():
+    if request.method == "GET":
+        cursor = conn.cursor()
+        cursor.execute("select title from song")
+        songs = cursor.fetchall()
+        print(songs)
+        return render_template('playlist.html', songs=songs)
     if request.method == "POST":
         print("in post method")
         playlistName = request.form['playlist']
         userName = session['username']
         description = request.form['description']
         creationDate = str(datetime.now())
-        song = request.form['song']
-
+        song = request.form.getlist('song-choice')
         print(playlistName)
-        print(song)
         print(userName)
         print(datetime)
-        ##add alert if user, playlist already exists
+        print(song)
+        if (len(playlistName) <=0  or playlistName is None) :
+             print("PlaylistName empty")
+             message = 'Playlist name is required. Please refresh page and try again'
+             return render_template('playlist.html', error=message)
+        if (checkLength(playlistName) != 1) :
+             print("PlaylistName exceeds length requirements")
+             message = 'Playlist name does not meet requirements should be between 1 and 50 chars. Please refresh page and try again'
+             return render_template('playlist.html', error=message)
+        if (checkPlaylistExists(userName, playlistName)) :
+            message = 'You have already created a playlist with this name. Please refresh page and try again'
+            return render_template('playlist.html', error=message)
         cursor = conn.cursor()
         # song, artistF, artistLast, album
         print("Creating new entry in Playlist Table")
-        cursor.execute(
-            "INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)",
-            (userName, playlistName, description, creationDate))
-        cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)",
-                       (userName, playlistName, song))
+        cursor.execute("INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)", (userName, playlistName, description, creationDate))
+        if song != None:
+            print('box checked')
+            for item in song:
+                print("Calling method")
+                print(getSongIDFromSong(item))
+                s = getSongIDFromSong(item)
+                songID = s[0]['songID']
+                cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)", (userName, playlistName, songID))
         conn.commit()
-        cursor.execute("select * from songsInPlaylist")
+        cursor.execute("select title, playlistName, count(title) from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s and playlistName = %s) gsp group by playlistName, title order by title", (userName, playlistName))
         data = cursor.fetchall()
         print(data)
-        return render_template('playlist.html', data=data)
+        cursor.execute("select title from song")
+        songs = cursor.fetchall()
+        return render_template('playlist.html', data=data, songs=songs)
+       
+    return render_template('playlist.html', data=data)
 
-    return render_template('playlist.html')
+     
 
+@app.route('/songs', methods=['GET', 'POST'])
+def songs():
+    cursor = conn.cursor()
+    cursor.execute("select title from song")
+    songs = cursor.fetchall()
+    print(songs)
+    return render_template('song.html', songs=songs)
 
 # friend
 
