@@ -484,7 +484,7 @@ def showplaylist():
     cursor.execute("select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName,title order by playlistName", (userName))
     alldata = cursor.fetchall()
     print(alldata)
-    cursor.execute("select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by playlistName", (userName))
+    cursor.execute("select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by count(playlistName)", (userName))
     countData = cursor.fetchall()
     print(countData)
 
