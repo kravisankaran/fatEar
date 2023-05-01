@@ -196,7 +196,11 @@
 
                                 <div class="card-text" style="margin-top: 2rem">
                                     {% for song_data in combined_song %}
+
                                         {% if song_data.songID == data.songID %}
+                                            <input type="hidden" name="song_id"
+                                                   value="{{ song_data.songID }}"
+                                                   class="hidden-song-id">
                                             <p style="margin-bottom: 0rem"><strong
                                                     class="{{ 'text-primary' if song_data.username == user_id }}">{{ song_data.username }}</strong>
                                             </p>
@@ -230,9 +234,7 @@
 
                                                     <div>
                                                         {% if song_data.username == user_id %}
-                                                            <input type="hidden" name="song_id"
-                                                                   value="{{ song_data.songID }}"
-                                                                   class="hidden-song-id">
+
                                                             <button type="button"
                                                                     class="song-rating-edit btn btn-link text-warning"
                                                                     style="padding: 0">Edit

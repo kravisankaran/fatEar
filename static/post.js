@@ -294,5 +294,53 @@ $(document).ready(function () {
 });
 
 // UPDATE SONG REVIEW
+$(document).ready(function () {
+    $(document).on('click', '.song-review-edit', function () {
+        var $this = $(this);
+        var $review = $this.parent().siblings('p');
+        var reviewText = $review.text();
+        var song_id = $(this).closest('.card').find('.hidden-song-id').val();
+
+        var user_id = $('body').data('user-id');
+        console.log(reviewText);
+        console.log(song_id);
+        console.log(user_id);
+
+        // Create a new input field with the current review text
+        var $newReview = $('<input type="text" placeholder={reviewText} class="form-control" value="' + reviewText + '">');
+        $review.replaceWith($newReview);
+
+        // Replace the edit and delete buttons with a save button
+        $this.hide();
+        $this.siblings('.song-review-delete').hide();
+        var $saveButton = $('<button type="button" class="song-review-save btn btn-link text-primary" style="padding: 0">Save</button>');
+        $this.after($saveButton);
+
+        // When the save button is clicked, send an AJAX request to update the review
+        $saveButton.on('click', function () {
+            var newReviewText = $newReview.val();
+            console.log(newReviewText);
+            $.ajax({
+                url: '/updateReviewSong',
+                method: 'POST',
+                data: {
+                    song_id: song_id,
+                    new_review_text: newReviewText,
+                    user_id: user_id
+                },
+                success: function (response) {
+                    // Replace the input field with the new review text
+                    $newReview.replaceWith('<p style="margin-bottom: 0rem">' + newReviewText + '</p>');
+                    alert('Successfully updated!');
+                    location.reload();
+                },
+                error: function (response) {
+                    alert('There was an error updating the review.');
+                    location.reload();
+                }
+            });
+        });
+    });
+});
 
 // DELETE SONG REVIEW
