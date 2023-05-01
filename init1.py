@@ -400,10 +400,13 @@ def search():
         #     ratingVal = int(rating)
         query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2, album, rating, genre)
         print(query)
+        if (query is None or len(query) <=0) :
+            message = 'Search returned no results'
+            render_template('search.html')
         cursor.execute(query[0], query[1])
         conn.commit()
         data = cursor.fetchall()
-        return render_template('search.html', data=data)
+        return render_template('search.html', data=data, error= message)
 
     return render_template('search.html')
 
@@ -471,7 +474,7 @@ def addPlaylist():
         print(countData)
         cursor.execute("select title from song")
         songs = cursor.fetchall()
-        return render_template('showplaylist.html', data=data, songs=songs, count=countData, alldata= alldata)
+        return render_template('playlist.html', data=data, songs=songs, count=countData, alldata= alldata)
        
     return render_template('playlist.html', data=data, songs=songs, count=countData, alldata = alldata)
 
