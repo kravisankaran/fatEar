@@ -50,9 +50,18 @@ def checkUserExist(username):
 
 def checkPlaylistExists(username, playlistName):
     with conn.cursor() as cursor:
-        query = "SELECT * FROM playlist WHERE username = '%s' % (username) and playlistName = '%s' % (playlistName)"
+        query = "SELECT * FROM playlist WHERE username = '%s' and playlistName = '%s'" % (username, playlistName)
         cursor.execute(query)
     result = cursor.fetchall()
+    print ("result : %s", result)
+    return result
+
+def getSongIDFromSong(song):
+    with conn.cursor() as cursor:
+        query = "SELECT songID FROM song WHERE title = '%s'" % (song)
+        cursor.execute(query)
+    result = cursor.fetchall()
+    print ("result : %s", result)
     return result
 # def allowed_image(filename):
 
@@ -359,6 +368,12 @@ def search():
 
 @app.route('/playlist', methods=['GET', 'POST'])
 def addPlaylist():
+    if request.method == "GET":
+        cursor = conn.cursor()
+        cursor.execute("select title from song")
+        songs = cursor.fetchall()
+        print(songs)
+        return render_template('playlist.html', songs=songs)
     if request.method == "POST":
         print("in post method")
         playlistName = request.form['playlist']
@@ -366,22 +381,33 @@ def addPlaylist():
         description = request.form['description']
         creationDate = str(datetime.now())
         song = request.form['song']
-        
+        songDict = getSongIDFromSong(song)
+        s = songDict[0]
+        songID = s['songID']
+
         print(playlistName)
         print(song)
         print(userName)
         print(datetime)
+        print(checkPlaylistExists(userName, playlistName))
+        if (checkPlaylistExists(userName, playlistName)) :
+            print("here in if")
+            message = 'You have already created a playlist with this name'
+            return render_template('playlist.html', error=message)
         ##add alert if user, playlist already exists
+
         cursor = conn.cursor()
         # song, artistF, artistLast, album
         print("Creating new entry in Playlist Table")
         cursor.execute("INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)", (userName, playlistName, description, creationDate))
-        cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)", (userName, playlistName, song))
+        cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)", (userName, playlistName, songID))
         conn.commit()
-        cursor.execute("select * from songsInPlaylist")
+        cursor.execute("select title, playlistName, count(title) from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s and playlistName = %s) gsp group by playlistName, title order by title", (userName, playlistName))
         data = cursor.fetchall()
         print(data)
-        return render_template('playlist.html', data=data)
+        cursor.execute("select title from song")
+        songs = cursor.fetchall()
+        return render_template('playlist.html', data=data, songs=songs)
        
     return render_template('playlist.html')
 
