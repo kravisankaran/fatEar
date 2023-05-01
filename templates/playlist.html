@@ -70,15 +70,17 @@
             
             {% for item in data %} 
                 <tr>
-                    <td> {{item.title}} has been added to playlist {{item.playlistName}} </td>
+                    <td> {{item.title}} has been added to playlist: {{item.playlistName}} </td>
                 </tr>
                 {% endfor %}
             </table>
             
             </center>
+            <center>
             {% if error %}
 				<p class="error"><strong>Error:</strong> {{error}}</p>
 			{% endif %}
+            
             </center>
         </div>
 
