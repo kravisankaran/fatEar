@@ -32,12 +32,18 @@
                 </br> 
                 <td> present in the album {{item.albumName}} </td>
                 </br>
-                <td> is rated {{item.stars}} </td>
+                <td> is rated {{item.stars}} on average </td>
                 </br>
-                <td> URL: {{item.songURL}} </td>
+                <td> URL: <a href= "{{item.songURL}}"> {{item.songURL}} </a> </td>
+            </br>
                 </br>
             </tr>
         {% endfor %}
         </center>
+        {% if error %}
+        <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    
+    </center>
     </body>
 </html>
