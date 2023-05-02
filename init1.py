@@ -400,10 +400,13 @@ def search():
         #     ratingVal = int(rating)
         query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2, album, rating, genre)
         print(query)
+        if (query is None or len(query) <=0) :
+            message = 'Search returned no results'
+            render_template('search.html')
         cursor.execute(query[0], query[1])
         conn.commit()
         data = cursor.fetchall()
-        return render_template('search.html', data=data)
+        return render_template('search.html', data=data, error= message)
 
     return render_template('search.html')
 
@@ -448,6 +451,9 @@ def addPlaylist():
         print("Creating new entry in Playlist Table")
         cursor.execute("INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)", (userName, playlistName, description, creationDate))
         if song != None:
+            if len(song) == 0:
+                message = 'You have chosen any song yet. Please refresh and try again'
+                return render_template('playlist.html', error=message)
             print('box checked')
             for item in song:
                 print("Calling method")
@@ -455,25 +461,37 @@ def addPlaylist():
                 s = getSongIDFromSong(item)
                 songID = s[0]['songID']
                 cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)", (userName, playlistName, songID))
+        
         conn.commit()
-        cursor.execute("select title, playlistName, count(title) from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s and playlistName = %s) gsp group by playlistName, title order by title", (userName, playlistName))
+        cursor.execute("select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s and playlistName = %s) gsp group by playlistName, title order by playlistName", (userName, playlistName))
         data = cursor.fetchall()
         print(data)
+        cursor.execute("select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName,title order by playlistName", (userName))
+        alldata = cursor.fetchall()
+        print(alldata)
+        cursor.execute("select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by playlistName", (userName))
+        countData = cursor.fetchall()
+        print(countData)
         cursor.execute("select title from song")
         songs = cursor.fetchall()
-        return render_template('playlist.html', data=data, songs=songs)
+        return render_template('playlist.html', data=data, songs=songs, count=countData, alldata= alldata)
        
-    return render_template('playlist.html', data=data)
+    return render_template('playlist.html', data=data, songs=songs, count=countData, alldata = alldata)
 
      
 
-@app.route('/songs', methods=['GET', 'POST'])
-def songs():
+@app.route('/showplaylist', methods=['GET', 'POST'])
+def showplaylist():
     cursor = conn.cursor()
-    cursor.execute("select title from song")
-    songs = cursor.fetchall()
-    print(songs)
-    return render_template('song.html', songs=songs)
+    userName = session['username']
+    cursor.execute("select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName,title order by playlistName", (userName))
+    alldata = cursor.fetchall()
+    print(alldata)
+    cursor.execute("select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by count(playlistName)", (userName))
+    countData = cursor.fetchall()
+    print(countData)
+
+    return render_template('showplaylist.html',count=countData, alldata= alldata)
 
 # friend
 
