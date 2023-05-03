@@ -2,17 +2,18 @@
 <html>
     <head>
         <title>FatEar Playlists</title>
+            
+        <meta name="viewport" content="width=device-width, initial-  
+        scale=1">
+
+        <link rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="/static/playlist.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
             crossorigin="anonymous"></script>
-            
-        <meta name="viewport" content="width=device-width, initial-  
-        scale=1">
-        <link rel="stylesheet" 
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="/static/search.css">
     </head>
     <style type="text/css">
       
@@ -46,42 +47,51 @@
         
         <div class="container-fluid">
             <h1><center>FatEar</center></h1>
-            <form class="example" method="post" action="" style="margin:auto;max-width:1000px">
+
+            <form class="mb-3 example" method="post" action="">
                 <br/>
-                <input type="text" placeholder="Name of Playlist" name="playlist">
+                <label for="playlist" class="form-label">Playlist name:</label>
+                <input class="form-control" type="text" placeholder="Name of Playlist" name="playlist">
                 <br/>
-                <a>
+
+                <div class="example">
                     {%for row in songs%}
-                    <dd id="rr-element">
-                      <input type="checkbox" name="song-choice" value="{{row.title}}" id="flexCheckChecked">
-                      <label for="rr-1"> {{row.title}}</label>
-                    </dd>
-                    <br>
-                      {% endfor %}
-                  </a>
-                <input type="text" placeholder="Add Description" name ="description">
-                <button type="submit" <i>Insert</i></button>
-                </button>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="song-choice" value="{{row.title}}" id="flexCheckChecked">
+                        <label class="form-check-label" for="flexCheckChecked"> {{row.title}}</label> 
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <br/>
+
+                <label for="description" class="form-label">Describe your playlist:</label>
+                <input class="form-control" type="text" placeholder="Add Description" name ="description">
+                <br/>
+
+                <button class="btn btn-primary mb-3" type="submit" <i>Insert</i></button>
+
             </form>
-            
+            <br>
+
             <center>
-              
             <table style="margin-left: 20px;">
-            
             {% for item in data %} 
                 <tr>
                     <td> {{item.title}} has been added to playlist: {{item.playlistName}} </td>
                 </tr>
-                {% endfor %}
+            {% endfor %}
             </table>
-            
             </center>
+
             <center>
             {% if error %}
-				<p class="error"><strong>Error:</strong> {{error}}</p>
+				<p class="error" style="color:red;"><strong>Error:</strong> {{error}}</p>
 			{% endif %}
-            
             </center>
+
+            <br>
+            <br>
         </div>
 
     </body>

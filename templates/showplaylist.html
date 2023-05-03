@@ -49,7 +49,7 @@
             <tbody>
             {% for item2 in count %}
                 <tr>
-                    <td> {{item2.playlistName}} has {{item2.total}} songs </td>
+                    <td style="font-weight: bold;"> {{item2.playlistName}} has {{item2.total}} songs: </td>
                     {% for item in alldata %}
                         {% if item2.playlistName == item.playlistName %}
                         <td> {{item.title}} </td>
