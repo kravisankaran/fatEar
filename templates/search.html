@@ -24,27 +24,30 @@
         <center>
         {% for item in data %}
             <tr>
-                <td> {{item.title}} </td>
+                <td> <b style="color:#185252; font-size: 20px;"s>{{item.title}}</b> </td>
                 </br>
-                <td> released on {{item.releaseDate}} </td>    
+                <td> released on <b>{{item.releaseDate}}</b></td>    
                 </br> 
-                <td> by {{item.fname}} {{item.lname}} </td> 
+                <td> by <b>{{item.fname}} {{item.lname}}</b> </td> 
                 </br> 
-                <td> present in the album {{item.albumName}} </td>
+                <td> present in the album <b>{{item.albumName}}</b> </td>
                 </br>
-                <td> is rated {{item.stars}} on average </td>
+                <td> is rated <b>{{item.stars}}</b> on average </td>
                 </br>
-                <td> URL: <a href= "{{item.songURL}}"> {{item.songURL}} </a> </td>
+                <td> URL: <b><a href= "{{item.songURL}}"> {{item.songURL}} </a></b> </td>
             </br>
-            <td> belongs to the  {{item.genre}} genre </td>
+            <td> belongs to the  <b>{{item.genre}}</b> genre </td>
                 </br>
             </br>
             </tr>
         {% endfor %}
         </center>
-        {% if error %}
-        <p class="error"><strong>Error:</strong> {{error}}</p>
-        {% endif %}
+
+        <center>
+            {% if error %}
+            <p class="error" style="color:red;"><strong>Error:</strong> {{error}}</p>
+            {% endif %}
+        </center>
     
     </center>
     </body>
