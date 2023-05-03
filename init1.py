@@ -5,18 +5,11 @@ from datetime import datetime
 from functools import wraps
 
 import pymysql.cursors
-from flask import render_template, request, session, url_for, redirect, jsonify
-
-# for uploading photo:
-from app import app
-
-# from flask import Flask, flash, request, redirect, render_template
-
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+from flask import Flask, render_template, request, session, url_for, redirect, jsonify
 
 ###Initialize the app from Flask
-##app = Flask(__name__)
-##app.secret_key = "secret key"
+app = Flask(__name__)
+app.secret_key = "secret key"
 
 # Configure MySQL
 conn = pymysql.connect(host='localhost',
@@ -69,27 +62,6 @@ def getSongs():
     result = cursor.fetchall()
     print ("title", result)
     return result
-
-
-# def allowed_image(filename):
-
-#     if not "." in filename:
-#         return False
-
-#     ext = filename.rsplit(".", 1)[1]
-
-#     if ext.upper() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
-#         return True
-#     else:
-#         return False
-
-
-# def allowed_image_filesize(filesize):
-
-#     if int(filesize) <= app.config["MAX_IMAGE_FILESIZE"]:
-#         return True
-#     else:
-#         return False
 
 
 # Define a route to hello function
@@ -177,7 +149,7 @@ def registerAuth():
         cursor.execute(ins, (username, hashedPassword, fname, lname, time.strftime('%Y-%m-%d %H:%M:%S'), nickname))
         conn.commit()
         cursor.close()
-        return render_template('index.html')
+        return render_template('login.html')
 
 
 @app.route('/logout')
