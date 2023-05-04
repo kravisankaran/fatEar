@@ -656,13 +656,21 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 
     elif x['s'] and x['f'] and x['a']:
         print('song, fname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(fname, None) and checkIfRatingExistsWithAlbum(album)) :
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            song, fname, album)
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where title like %s and a.fname like %s and alb.albumName like %s", (
             song, fname, album)
 
     elif x['s'] and x['f'] and x['g']:
         print('song, fname, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(fname, None) and checkIfRatingExistsWithGenre(genre)):
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             song, fname, genre)
+        else:
+           return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where title like %s and a.fname like %s and gen.genre like %s", (
+            song, fname, genre) 
    
     elif x['s'] and x['f'] and x['r']:
         print('song, fname, rating present')
@@ -671,14 +679,22 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
     
     elif x['s'] and x['f'] and x['l']:
         print('song, artist fname, artist lname are present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where title like %s and a.fname like %s and a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(fname, lname)):
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where title like %s and a.fname like %s and a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            song, fname, lname)
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s", (
             song, fname, lname)
 
     elif x['s'] and x['l'] and x['a']:
         print('song, lname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(None, lname) and checkIfRatingExistsWithAlbum(album)) :
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             song, lname, album)
-
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s", (
+            song, lname, album)
+        
     elif x['s'] and x['l'] and x['r']:
         print('song, lname, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s and rat.stars = %s", (
@@ -686,22 +702,34 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
     
     elif x['s'] and x['l'] and x['g']:
         print('song, lname, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(None, lname) and checkIfRatingExistsWithGenre(genre)) :
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            song, lname, genre)
+        else :
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where title like %s and a.lname like %s and gen.genre like %s", (
             song, lname, genre)
 
     elif x['f'] and x['l'] and x['a']:
         print('fname, lname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithArtist(fname, lname) and checkIfRatingExistsWithAlbum(album)):
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            fname, lname, album)
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and alb.albumName like %s", (
             fname, lname, album)
     
     elif x['f'] and x['l'] and x['g']:
         print('fname, lname, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithArtist(fname, lname) and checkIfRatingExistsWithGenre(genre)):
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            fname, lname, genre)
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and gen.genre like %s", (
             fname, lname, genre)
 
     elif x['f'] and x['l'] and x['r']:
         print('fname, lname, rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and rat.stars = %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and rat.stars = %s", (
             fname, lname, ratingVal)
 
     elif x['a'] and x['l'] and x['r']:
@@ -711,7 +739,11 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 
     elif x['a'] and x['l'] and x['g']:
         print('album, lname, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where alb.albumName like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithAlbum(album) and checkIfRatingExistsWithArtist(None, lname) and checkIfRatingExistsWithGenre(genre)) :
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where alb.albumName like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            album, lname, genre)
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where alb.albumName like %s and a.lname like %s and gen.genre like %s", (
             album, lname, genre)
     
     elif x['a'] and x['f'] and x['r']:
@@ -721,7 +753,11 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
     
     elif x['a'] and x['f'] and x['g']:
         print('album, fname, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where alb.albumName like %s and a.fname like %s  and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        if (checkIfRatingExistsWithAlbum(album) and checkIfRatingExistsWithArtist(fname, None) and checkIfRatingExistsWithGenre(genre)) :
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where alb.albumName like %s and a.fname like %s  and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            album, fname, genre)
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a  where alb.albumName like %s and a.fname like %s and gen.genre like %s", (
             album, fname, genre)
 
     elif x['a'] and x['s'] and x['r']:
@@ -735,7 +771,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen  natural join artist a  where  alb.albumName like %s and title like %s  and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             album, song, genre)
         else:
-            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen  natural join artist a  where  alb.albumName like %s and title like %s  and gen.genre like %s", (
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a  where  alb.albumName like %s and title like %s  and gen.genre like %s", (
             album, song, genre)
    
     elif x['a'] and x['g'] and x['r']:
