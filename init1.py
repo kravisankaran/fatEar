@@ -89,14 +89,15 @@ def getSongIDFromArtist(artistID):
 
 def getSongIDFromGenre(genre):
     with conn.cursor() as cursor:
-        query = "SELECT songID FROM songGenre WHERE genre = '%s'" % (genre)
+        query = "SELECT songID FROM songGenre WHERE genre like '%s'" % (genre)
         cursor.execute(query)
     result = cursor.fetchall()
     return result
 
 def getSongIDFromRateSong(songID):
     with conn.cursor() as cursor:
-        query = "SELECT songID FROM rateSong WHERE songID = '%s'" % (songID)
+        print(songID)
+        query = "SELECT songID FROM rateSong WHERE songID in ({})".format(str(songID)[1:-1])
         cursor.execute(query)
     result = cursor.fetchall()
     #print (result)
@@ -104,10 +105,10 @@ def getSongIDFromRateSong(songID):
 
 def getSongs():
     with conn.cursor() as cursor:
-        query = "SELECT title FROM song"
+        query = "SELECT songID FROM song"
         cursor.execute(query)
     result = cursor.fetchall()
-    print ("title", result)
+    print ("songID", result)
     return result
 
 
@@ -830,33 +831,56 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
     
     elif x['f']:
         print('only firstname')
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where a.fname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
+        print('checking rating: ', checkIfRatingExistsWithArtist(fname, None))
+        if (checkIfRatingExistsWithArtist(fname, None)) :
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where a.fname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
+            fname)
+        else:
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join  artist a  where a.fname like %s ", (
             fname)
 
     elif x['l']:
         print('only lastname')
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
+        print('checking rating: ', checkIfRatingExistsWithArtist(None, lname))
+        if (checkIfRatingExistsWithArtist(None, lname)) :
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
             lname)
-
+        else:
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a  where a.lname like %s ", (
+            lname)
     elif x['s']:
         print('only song')
         print('checking rating: ', checkIfRatingExistsWithSong(song))
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a   where title like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
+        if (checkIfRatingExistsWithSong(song)) :
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a   where title like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
             song)
+        else :
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join songGenre gen natural join artist a  where title like %s", (
+            song)
+
     elif x['a']:
         print('only album')
         print('check rating:', checkIfRatingExistsWithAlbum(album))
-        return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
+        if (checkIfRatingExistsWithAlbum(album)) :
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
             album)
+        else:
+            return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join  artist a where alb.albumName like %s", (album)
+
 
     elif x['r']:
         print('only rating')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where rat.stars like %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where rat.stars like %s", (
             ratingVal)
 
     elif x['g']:
         print('only genre')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+        print('check rating:', checkIfRatingExistsWithGenre(genre))
+        if (checkIfRatingExistsWithGenre(genre)) :
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            genre)
+        else:
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join songGenre gen natural join  artist a where gen.genre like %s", (
             genre)
     else:
         print('nothing was picked')
@@ -864,7 +888,9 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 def checkIfRatingExistsWithSong(song):
     s = getSongIDFromSong(song)
     print(s)
-    songID = s[0]['songID']
+    if s == None or len(s) == 0:
+        return 0
+    songID = [d['songID'] for d in s]
     if (len(getSongIDFromRateSong(songID)) <= 0) :
         print(getSongIDFromRateSong(songID))
         return 0
@@ -875,43 +901,84 @@ def checkIfRatingExistsWithSong(song):
 def checkIfRatingExistsWithAlbum(album):
     a = getAlbumIDFromAlbum(album)
     print(a)
+    if a == None or len(a) == 0:
+        return 0
     albumID = a[0]['albumID']
     print(albumID)
     s = getSongIDFromAlbum(albumID)
-    songID = s[0]['songID']
-    print(songID)
+    songID = [d['songID'] for d in s]
+    print('songID:', songID)
     if (len(getSongIDFromRateSong(songID)) <= 0) :
+        print('No song from the album has ratings')
         print(getSongIDFromRateSong(songID))
         return 0
     else:
-        print(getSongIDFromRateSong(songID))
-        return 1
+        set1 = songID
+        print("set1: ", set1)
+        set2 = getSongIDFromRateSong(songID)
+        l2 = [ d['songID'] for d in set2]
+        print("set2: ", set2)
+        diff = set(set1) ^ set(l2)
+        if (len(diff) != 0) :
+            print("Songs without rating", diff)
+            return 0
+        else:
+            print("All songs have a rating")
+            return 1
+       
 
 def checkIfRatingExistsWithArtist(fname, lname):
     a = getArtistIDFromArtist(fname, lname)
     print(a)
+    if a == None or len(a) == 0:
+        return 0
     artistID = a[0]['artistID']
     print(artistID)
     s = getSongIDFromArtist(artistID)
-    songID = s[0]['songID']
+    songID = [d['songID'] for d in s]
     print(songID)
     if (len(getSongIDFromRateSong(songID)) <= 0) :
+        print('No song by this artist has ratings')
         print(getSongIDFromRateSong(songID))
         return 0
+    
     else:
-        print(getSongIDFromRateSong(songID))
-        return 1
+        set1 = songID
+        print("set1: ", set1)
+        set2 = getSongIDFromRateSong(songID)
+        l2 = [ d['songID'] for d in set2]
+        print("set2: ", set2)
+        diff = set(set1) ^ set(l2)
+        if (len(diff) != 0) :
+            print("Songs by this artist without rating", diff)
+            return 0
+        else:
+            print("All songs by this artist have a rating")
+            return 1
 
 def checkIfRatingExistsWithGenre(genre):
     s = getSongIDFromGenre(genre)
-    songID = s[0]['songID']
+    if s == None or len(s) == 0:
+        return 0
+    songID = [d['songID'] for d in s]
     print(songID)
     if (len(getSongIDFromRateSong(songID)) <= 0) :
+        print('No song in this genre has ratings')
         print(getSongIDFromRateSong(songID))
         return 0
     else:
-        print(getSongIDFromRateSong(songID))
-        return 1
+        set1 = songID
+        print("set1: ", set1)
+        set2 = getSongIDFromRateSong(songID)
+        l2 = [ d['songID'] for d in set2]
+        print("set2: ", set2)
+        diff = set(set1) ^ set(l2)
+        if (len(diff) != 0) :
+            print("Songs in this genre that dont have a rating", diff)
+            return 0
+        else:
+            print("All songs in this genre have a rating")
+            return 1
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
