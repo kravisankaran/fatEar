@@ -554,27 +554,27 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 
     elif x['s'] and x['r']:
         print('song and rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where title like %s and rat.stars like %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a  where title like %s and rat.stars >= %s", (
             song, ratingVal)
 
     elif x['a'] and x['r']:
         print('album and rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where alb.albumName like %s and rat.stars like %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where alb.albumName like %s and rat.stars >= %s", (
             album, ratingVal)
 
     elif x['f'] and x['r']:
         print('fname and rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where a.fname like %s and rat.stars like %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where a.fname like %s and rat.stars >= %s", (
             fname, ratingVal)
 
     elif x['l'] and x['r']:
         print('lname and rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where a.lname like %s and rat.stars like %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where a.lname like %s and rat.stars >= %s", (
             lname, ratingVal)
     
     elif x['g'] and x['r']:
         print('genre and rating present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where gen.genre like %s and rat.stars like %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where gen.genre like %s and rat.stars >= %s", (
             genre, ratingVal)
     
     elif x['s'] and x['g']:
@@ -654,14 +654,14 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 
     elif x['r']:
         print('only rating')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where rat.stars like %s", (
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where rat.stars >= %s", (
             ratingVal)
 
     elif x['g']:
         print('only genre')
         print('check rating:', checkIfRatingExistsWithGenre(genre))
         if (checkIfRatingExistsWithGenre(genre)) :
-            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             genre)
         else:
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join songGenre gen natural join artist a where gen.genre like %s", (
