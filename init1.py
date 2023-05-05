@@ -140,7 +140,7 @@ def loginAuth():
     ## need to change varchar limit in order for this to work
     hashedPassword = hashlib.sha256(plaintextPasword.encode("utf-8")).hexdigest()
 
-    lastlogin = time.strftime('%Y-%m-%d')
+    lastlogin = time.strftime('%Y-%m-%d %H:%M:%S')
 
     # cursor used to send queries
     cursor = conn.cursor()
