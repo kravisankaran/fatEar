@@ -2063,6 +2063,109 @@ def fan_of_artist():
         return redirect(url_for('fetchList', error_fan=error_fan, error_artist_id=artist_id))
     else:
         return redirect(url_for('fetchList'))
+    
+@login_required
+@app.route("/feed", methods=['GET'])
+def feed():
+    user_id = session['username']
+    cursor = conn.cursor()
+
+    # Get the user's last login date
+    cursor.execute("SELECT lastlogin FROM user WHERE username = %s", (user_id,))
+    result = cursor.fetchone()
+
+    if result is None:
+        return "User not found", 404
+
+    last_login = result['lastlogin']
+    fan_date_query = "SELECT fanAt FROM userFanOfArtist WHERE username = %s"
+    cursor.execute(fan_date_query, (user_id,))
+    # fanSince = cursor.fetchone()['fanAt']
+
+    # Fetch new reviews and ratings by friends or followers since the last login
+    query1 = '''
+        SELECT 
+            d.relationship,
+            d.username as display_name,
+            a.artistID, a.fname, a.lname, s.songID, s.title, al.albumID, al.albumName, sg.genre,
+            action_table.action_type,
+            action_table.rating,
+            action_table.review,
+            action_table.action_date
+        FROM (
+            SELECT 
+                u.username,
+                CASE 
+                    WHEN f1.acceptStatus = "accepted" AND f2.follower IS NOT NULL THEN 'both'
+                    WHEN f1.acceptStatus = "accepted" THEN 'friend'
+                    ELSE 'follower' 
+                END as relationship
+            FROM user u
+            JOIN (
+                SELECT user1 as friend FROM friend WHERE user2 = %s AND acceptStatus = "accepted"
+                UNION
+                SELECT user2 as friend FROM friend WHERE user1 = %s AND acceptStatus = "accepted"
+                UNION
+                SELECT follows as friend FROM follows WHERE follower = %s
+            ) friends ON friends.friend = u.username
+            LEFT JOIN friend f1 ON (f1.user1 = u.username AND f1.user2 = %s) OR (f1.user1 = %s AND f1.user2 = u.username)
+            LEFT JOIN follows f2 ON f2.follows = u.username AND f2.follower = %s
+        ) d
+        LEFT JOIN (
+            SELECT username, 'rateAlbum' as action_type, ratingDate as action_date, stars as rating, NULL as review, albumID, NULL as songID
+            FROM rateAlbum
+            UNION ALL
+            SELECT username, 'reviewAlbum' as action_type, reviewDate as action_date, NULL as rating, reviewText as review, albumID, NULL as songID
+            FROM reviewAlbum
+            UNION ALL
+            SELECT username, 'rateSong' as action_type, ratingDate as action_date, stars as rating, NULL as review, NULL as albumID, songID
+            FROM rateSong
+            UNION ALL
+            SELECT username, 'reviewSong' as action_type, reviewDate as action_date, NULL as rating, reviewText as review, NULL as albumID, songID
+            FROM reviewSong
+        ) action_table ON action_table.username = d.username AND action_table.action_date <= %s
+        LEFT JOIN song s ON s.songID = action_table.songID
+        LEFT JOIN artistPerformsSong aPS ON aPS.songID = s.songID
+        LEFT JOIN artist a ON a.artistID = aPS.artistID
+        LEFT JOIN songInAlbum sIA ON sIA.songID = s.songID
+        LEFT JOIN album al ON al.albumID = COALESCE(action_table.albumID, sIA.albumID)
+        LEFT JOIN songGenre sg ON sg.songID = s.songID
+        WHERE action_table.albumID IS NOT NULL OR action_table.songID IS NOT NULL
+        ORDER BY action_table.action_date DESC;
+    '''
+
+    cursor.execute(query1, (
+        user_id, user_id, user_id, user_id, user_id, user_id, last_login))
+
+    friend_actions = cursor.fetchall()
+
+    # Fetch new songs by artists the user is a fan of
+    query2 = '''
+        SELECT a.fname, a.lname, s.songID, s.title, al.albumID, al.albumName, sg.genre, s.releaseDate, s.songURL
+        FROM song s
+        JOIN artistPerformsSong aPS ON aPS.songID = s.songID
+        JOIN artist a ON a.artistID = aPS.artistID
+        JOIN songInAlbum sIA ON sIA.songID = s.songID
+        JOIN album al ON al.albumID = sIA.albumID
+        JOIN songGenre sg ON sg.songID = s.songID
+        JOIN (
+            SELECT artistID, fanAt FROM userFanOfArtist WHERE username = %s
+        ) uf ON uf.artistID = a.artistID
+        WHERE CAST(s.releaseDate AS DATETIME) >= CAST(uf.fanAt AS DATETIME)
+        ORDER BY s.releaseDate DESC;
+       '''
+
+    cursor.execute(query2, (user_id,))
+    new_songs = cursor.fetchall()
+    cursor.close()
+
+    return render_template("feed.html", friend_actions=friend_actions, new_songs=new_songs)
+
+
+@app.template_filter('to_int')
+def to_int_filter(value):
+    return int(value)
+
 
 
 app.secret_key = 'some key that you will never guess'
