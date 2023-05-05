@@ -604,23 +604,23 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, fname, lastname, album present')
         if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(fname,
                                                                                 lname) and checkIfRatingExistsWithAlbum(
-                album)):
+            album)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
-            song, fname, lname, album)
+                song, fname, lname, album)
         else:
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s ", (
-            song, fname, lname, album)
+                song, fname, lname, album)
 
     elif x['s'] and x['f'] and x['l'] and x['g']:
         print('song, fname, lastname, genre present')
         if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(fname,
                                                                                 lname) and checkIfRatingExistsWithGenre(
-                genre)):
+            genre)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
-            song, fname, lname, genre)
+                song, fname, lname, genre)
         else:
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and gen.genre like %s", (
-            song, fname, lname, genre)
+                song, fname, lname, genre)
 
     elif x['s'] and x['f'] and x['l'] and x['r']:
         print('song, fname, lname, rating present')
@@ -645,7 +645,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
     elif x['s'] and x['f'] and x['r'] and x['g']:
         print('song, fname, rating, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s  and rat.stars = %s and  gen.genre like %s", (
-        song, fname, ratingVal, genre)
+            song, fname, ratingVal, genre)
 
     elif x['s'] and x['l'] and x['a'] and x['r']:
         print('song, lname,  album, rating present')
@@ -708,7 +708,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, fname, album present')
         if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(fname,
                                                                                 None) and checkIfRatingExistsWithAlbum(
-                album)):
+            album)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
                 song, fname, album)
         else:
@@ -719,7 +719,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, fname, genre present')
         if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(fname,
                                                                                 None) and checkIfRatingExistsWithGenre(
-                genre)):
+            genre)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
                 song, fname, genre)
         else:
@@ -744,7 +744,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, lname, album present')
         if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(None,
                                                                                 lname) and checkIfRatingExistsWithAlbum(
-                album)):
+            album)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s  and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
                 song, lname, album)
         else:
@@ -760,7 +760,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, lname, genre present')
         if (checkIfRatingExistsWithSong(song) and checkIfRatingExistsWithArtist(None,
                                                                                 lname) and checkIfRatingExistsWithGenre(
-                genre)):
+            genre)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
                 song, lname, genre)
         else:
@@ -799,7 +799,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('album, lname, genre present')
         if (checkIfRatingExistsWithAlbum(album) and checkIfRatingExistsWithArtist(None,
                                                                                   lname) and checkIfRatingExistsWithGenre(
-                genre)):
+            genre)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where alb.albumName like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
                 album, lname, genre)
         else:
@@ -815,7 +815,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('album, fname, genre present')
         if (checkIfRatingExistsWithAlbum(album) and checkIfRatingExistsWithArtist(fname,
                                                                                   None) and checkIfRatingExistsWithGenre(
-                genre)):
+            genre)):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a  where alb.albumName like %s and a.fname like %s  and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
                 album, fname, genre)
         else:
@@ -2142,6 +2142,9 @@ def feed():
         return "User not found", 404
 
     last_login = result['lastlogin']
+    fan_date_query = "SELECT fanAt FROM userFanOfArtist WHERE username = %s"
+    cursor.execute(fan_date_query, (user_id,))
+    fanSince = cursor.fetchone()['fanAt']
 
     # Fetch new reviews and ratings by friends or followers since the last login
     query1 = '''
@@ -2199,7 +2202,6 @@ def feed():
         user_id, user_id, user_id, user_id, user_id, user_id, last_login))
 
     friend_actions = cursor.fetchall()
-    print("Friend Actions:", friend_actions)
 
     # Fetch new songs by artists the user is a fan of
     query2 = '''
@@ -2210,12 +2212,16 @@ def feed():
         JOIN songInAlbum sIA ON sIA.songID = s.songID
         JOIN album al ON al.albumID = sIA.albumID
         JOIN songGenre sg ON sg.songID = s.songID
-        JOIN userFanOfArtist uf ON uf.artistID = a.artistID
-        WHERE uf.username = %s AND s.releaseDate <= %s;
+        JOIN (
+            SELECT artistID, fanAt FROM userFanOfArtist WHERE username = %s
+        ) uf ON uf.artistID = a.artistID
+        WHERE CAST(s.releaseDate AS DATETIME) >= CAST(uf.fanAt AS DATETIME)
+        ORDER BY s.releaseDate DESC;
        '''
 
-    cursor.execute(query2, (user_id, last_login))
+    cursor.execute(query2, (user_id,))
     new_songs = cursor.fetchall()
+    cursor.close()
 
     return render_template("feed.html", friend_actions=friend_actions, new_songs=new_songs)
 

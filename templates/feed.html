@@ -20,7 +20,7 @@
 {% include 'common/navbar.html' %}
 <div class="container">
     <h2 class="my-4">Feed</h2>
-    <p>You have {{ friend_actions|length }} new feed items since your last login.</p>
+    <p>You have {{ friend_actions|length + new_songs|length }} new feed items since your last login.</p>
     <h3 class="my-3">New reviews and ratings by friends or followers:</h3>
     {% for action in friend_actions %}
         <div class="card mb-3">
