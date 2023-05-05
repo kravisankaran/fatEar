@@ -1,6 +1,6 @@
 # fatEar
-Implementation of fatEar application for CS-6083
 
+Implementation of fatEar application for CS-6083
 
 ## Built With
 
@@ -18,6 +18,31 @@ Implementation of fatEar application for CS-6083
 ```commandline
 flask --app init1 run
 ```
+
+## Search page (/search)
+
+### Features:
+
+1. Users can search the database
+    - by song,
+      and/or
+    - by artist name
+        - (by first name or last name or both),
+          and/or
+    - by album name
+      and/or
+    - by a rating threshold (rating of a song)
+      and/or
+    - by genre
+2. The more parameters we specify - the more specific the search will be.
+3. Search is based on a fuzzy text match for string fields and a rating threshold for stars
+4. If a song has been rated more than once - an average rating will be returned in the results
+5. Search results will contain rating information only if ratings are present for songs matching the parameters
+
+### Error Handling
+
+1. If no search parameters are specified
+2. If nothing matches the search parameters
 
 ## Post page (/post)
 
