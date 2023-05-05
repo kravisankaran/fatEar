@@ -44,23 +44,25 @@ def checkPlaylistExists(username, playlistName):
         query = "SELECT * FROM playlist WHERE username = '%s' and playlistName = '%s'" % (username, playlistName)
         cursor.execute(query)
     result = cursor.fetchall()
-    print ("result : %s", result)
+    print("result : %s", result)
     return result
+
 
 def getSongIDFromSong(song):
     with conn.cursor() as cursor:
         query = "SELECT songID FROM song WHERE title = '%s'" % (song)
         cursor.execute(query)
     result = cursor.fetchall()
-    #print (result)
+    # print (result)
     return result
+
 
 def getSongs():
     with conn.cursor() as cursor:
         query = "SELECT title FROM song"
         cursor.execute(query)
     result = cursor.fetchall()
-    print ("title", result)
+    print("title", result)
     return result
 
 
@@ -181,32 +183,32 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, album, fname, lname, rating, genre picked')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre , gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s and rat.stars = %s and gen.genre like %s", (
             song, fname, lname, album, ratingVal, genre)
-    
+
     elif x['s'] and x['a'] and x['f'] and x['l'] and x['g']:
         print('song, album, fname, lname, genre picked')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre , gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             song, fname, lname, album, genre)
-    
+
     elif x['s'] and x['a'] and x['f'] and x['r'] and x['g']:
         print('song, album, fname, rating, genre picked')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre , gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and rat.stars = %s and alb.albumName like %s and gen.genre like %s", (
             song, fname, ratingVal, album, genre)
-    
+
     elif x['s'] and x['a'] and x['l'] and x['r'] and x['g']:
         print('song, album, lname, rating, genre picked')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre , gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s and rat.stars = %s and alb.albumName like %s and gen.genre like %s", (
             song, lname, ratingVal, album, genre)
-    
+
     elif x['f'] and x['a'] and x['l'] and x['r'] and x['g']:
         print('fname, album, lname, rating, genre picked')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre , gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where a.fname like %s and a.lname like %s and rat.stars = %s and alb.albumName like %s and gen.genre like %s", (
             fname, lname, ratingVal, album, genre)
-   
+
     elif x['f'] and x['a'] and x['l'] and x['r'] and x['g']:
         print('fname, song, lname, rating, genre picked')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre , gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where a.fname like %s and a.lname like %s and rat.stars = %s and title like %s and gen.genre like %s", (
             fname, lname, ratingVal, song, genre)
-    
+
     elif x['s'] and x['a'] and x['f'] and x['l'] and x['r']:
         print('song, album, fname, lname, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s and rat.stars = %s", (
@@ -214,12 +216,14 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 
     elif x['s'] and x['f'] and x['l'] and x['a']:
         print('song, fname, lastname, album present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", ( song, fname, lname, album)
- 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
+            song, fname, lname, album)
+
     elif x['s'] and x['f'] and x['l'] and x['g']:
         print('song, fname, lastname, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and get.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", ( song, fname, lname, genre)
- 
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and get.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
+            song, fname, lname, genre)
+
     elif x['s'] and x['f'] and x['l'] and x['r']:
         print('song, fname, lname, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and a.lname like %s and rat.stars = %s", (
@@ -237,7 +241,8 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 
     elif x['s'] and x['f'] and x['r'] and x['g']:
         print('song, fname, rating, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s  and rat.stars = %s and  gen.genre like %s", (song, fname, ratingVal, genre)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s  and rat.stars = %s and  gen.genre like %s", (
+            song, fname, ratingVal, genre)
 
     elif x['s'] and x['l'] and x['a'] and x['r']:
         print('song, lname,  album, rating present')
@@ -285,7 +290,7 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, album, rating, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and alb.albumName like %s  and rat.stars = %s and gen.genre like %s ", (
             song, album, ratingVal, genre)
- 
+
 
     elif x['s'] and x['f'] and x['a']:
         print('song, fname, album present')
@@ -296,12 +301,12 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, fname, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             song, fname, genre)
-   
+
     elif x['s'] and x['f'] and x['r']:
         print('song, fname, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and rat.stars = %s", (
             song, fname, ratingVal)
-    
+
     elif x['s'] and x['f'] and x['l']:
         print('song, artist fname, artist lname are present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where title like %s and a.fname like %s and a.lname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
@@ -316,7 +321,7 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('song, lname, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s and rat.stars = %s", (
             song, lname, ratingVal)
-    
+
     elif x['s'] and x['l'] and x['g']:
         print('song, lname, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where title like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
@@ -326,7 +331,7 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('fname, lname, album present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and alb.albumName like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             fname, lname, album)
-    
+
     elif x['f'] and x['l'] and x['g']:
         print('fname, lname, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a  where a.fname like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
@@ -346,12 +351,12 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('album, lname, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a where alb.albumName like %s and a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             album, lname, genre)
-    
+
     elif x['a'] and x['f'] and x['r']:
         print('album, fname, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a  where alb.albumName like %s and a.fname like %s  and rat.stars = %s", (
             album, fname, ratingVal)
-    
+
     elif x['a'] and x['f'] and x['g']:
         print('album, fname, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join artist a  where alb.albumName like %s and a.fname like %s  and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
@@ -366,7 +371,7 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('album, song, genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen  natural join artist a  where  alb.albumName like %s and title like %s  and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             album, song, genre)
-   
+
     elif x['a'] and x['g'] and x['r']:
         print('album, genre, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen  natural join artist a  where alb.albumName like %s and gen.genre like %s and rat.stars = %s", (
@@ -376,12 +381,12 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('lname, genre, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen  natural join artist a  where a.lname like %s and gen.genre like %s and rat.stars = %s", (
             lname, genre, ratingVal)
-    
+
     elif x['f'] and x['g'] and x['r']:
         print('fname, genre, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen  natural join artist a  where a.fname like %s and gen.genre like %s and rat.stars = %s", (
             fname, genre, ratingVal)
-   
+
     elif x['s'] and x['g'] and x['r']:
         print('song, genre, rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen  natural join artist a  where title like %s and gen.genre like %s and rat.stars = %s", (
@@ -436,12 +441,12 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('lname and rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where a.lname like %s and rat.stars like %s", (
             lname, ratingVal)
-    
+
     elif x['g'] and x['r']:
         print('genre and rating present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where gen.genre like %s and rat.stars like %s", (
             genre, ratingVal)
-    
+
     elif x['s'] and x['g']:
         print('song and genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where title like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
@@ -451,17 +456,17 @@ def getSearchQuery(x, song, fname, lname, album, ratingVal, genre):
         print('fname and genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where a.fname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             fname, genre)
-    
+
     elif x['l'] and x['g']:
         print('lname and genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where a.lname like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             lname, genre)
-    
+
     elif x['a'] and x['g']:
         print('album and genre present')
         return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where alb.albumName like %s and gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             album, genre)
-    
+
     elif x['f']:
         print('only firstname')
         return "select distinct s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre, avg(rat.stars) as stars from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateAlbum rat natural join songGenre gen natural join  artist a  where a.fname like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre ", (
@@ -530,25 +535,27 @@ def search():
         #     ratingVal = int(rating)
         query = getSearchQuery(parameterMap, song2, artistFName2, artistLName2, album, rating, genre)
         print(query)
-        if (query == None or len(query) <=0) :
+        if (query == None or len(query) <= 0):
             message = 'No search params were entered, please refresh and try again!'
             return render_template('search.html', error=message)
         cursor.execute(query[0], query[1])
         conn.commit()
         data = cursor.fetchall()
-        if (len(data) <=0) :
+        if (len(data) <= 0):
             message = 'No valid search results, please refresh and try again!'
             return render_template('search.html', error=message)
-        
+
         return render_template('search.html', data=data)
 
     return render_template('search.html')
 
-def checkLength(field) :
+
+def checkLength(field):
     l = len(field)
-    if l <=0 or l > 50 :
+    if l <= 0 or l > 50:
         return 0
     return 1
+
 
 @app.route('/playlist', methods=['GET', 'POST'])
 def addPlaylist():
@@ -569,21 +576,23 @@ def addPlaylist():
         print(userName)
         print(datetime)
         print(song)
-        if (len(playlistName) <=0  or playlistName is None) :
-             print("PlaylistName empty")
-             message = 'Playlist name is required. Please refresh page and try again'
-             return render_template('playlist.html', error=message)
-        if (checkLength(playlistName) != 1) :
-             print("PlaylistName exceeds length requirements")
-             message = 'Playlist name does not meet requirements should be between 1 and 50 chars. Please refresh page and try again'
-             return render_template('playlist.html', error=message)
-        if (checkPlaylistExists(userName, playlistName)) :
+        if (len(playlistName) <= 0 or playlistName is None):
+            print("PlaylistName empty")
+            message = 'Playlist name is required. Please refresh page and try again'
+            return render_template('playlist.html', error=message)
+        if (checkLength(playlistName) != 1):
+            print("PlaylistName exceeds length requirements")
+            message = 'Playlist name does not meet requirements should be between 1 and 50 chars. Please refresh page and try again'
+            return render_template('playlist.html', error=message)
+        if (checkPlaylistExists(userName, playlistName)):
             message = 'You have already created a playlist with this name. Please refresh page and try again'
             return render_template('playlist.html', error=message)
         cursor = conn.cursor()
         # song, artistF, artistLast, album
         print("Creating new entry in Playlist Table")
-        cursor.execute("INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)", (userName, playlistName, description, creationDate))
+        cursor.execute(
+            "INSERT INTO playlist (username, playlistName, description, creationDate) VALUES(%s, %s, %s, %s)",
+            (userName, playlistName, description, creationDate))
         if song != None:
             if len(song) == 0:
                 message = 'You have chosen any song yet. Please refresh and try again'
@@ -594,38 +603,49 @@ def addPlaylist():
                 print(getSongIDFromSong(item))
                 s = getSongIDFromSong(item)
                 songID = s[0]['songID']
-                cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)", (userName, playlistName, songID))
-        
+                cursor.execute("INSERT INTO songsInPlaylist (username, playlistName, songID) VALUES(%s, %s, %s)",
+                               (userName, playlistName, songID))
+
         conn.commit()
-        cursor.execute("select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s and playlistName = %s) gsp group by playlistName, title order by playlistName", (userName, playlistName))
+        cursor.execute(
+            "select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s and playlistName = %s) gsp group by playlistName, title order by playlistName",
+            (userName, playlistName))
         data = cursor.fetchall()
         print(data)
-        cursor.execute("select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName,title order by playlistName", (userName))
+        cursor.execute(
+            "select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName,title order by playlistName",
+            (userName))
         alldata = cursor.fetchall()
         print(alldata)
-        cursor.execute("select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by playlistName", (userName))
+        cursor.execute(
+            "select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by playlistName",
+            (userName))
         countData = cursor.fetchall()
         print(countData)
         cursor.execute("select title from song")
         songs = cursor.fetchall()
-        return render_template('playlist.html', data=data, songs=songs, count=countData, alldata= alldata)
-       
-    return render_template('playlist.html', data=data, songs=songs, count=countData, alldata = alldata)
+        return render_template('playlist.html', data=data, songs=songs, count=countData, alldata=alldata)
 
-     
+    return render_template('playlist.html', data=data, songs=songs, count=countData, alldata=alldata)
+
 
 @app.route('/showplaylist', methods=['GET', 'POST'])
 def showplaylist():
     cursor = conn.cursor()
     userName = session['username']
-    cursor.execute("select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName,title order by playlistName", (userName))
+    cursor.execute(
+        "select title, playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName,title order by playlistName",
+        (userName))
     alldata = cursor.fetchall()
     print(alldata)
-    cursor.execute("select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by count(playlistName)", (userName))
+    cursor.execute(
+        "select playlistName, count(playlistName) as total from (select title, playlistName, username, sp.songID from song s join songsInPlaylist sp ON s.songID = sp.songID where username = %s) gsp group by playlistName order by count(playlistName)",
+        (userName))
     countData = cursor.fetchall()
     print(countData)
 
-    return render_template('showplaylist.html',count=countData, alldata= alldata)
+    return render_template('showplaylist.html', count=countData, alldata=alldata)
+
 
 # friend
 
@@ -1474,10 +1494,11 @@ def fan_of_artist():
     else:
         return redirect(url_for('fetchList'))
 
+
 @login_required
 @app.route("/feed", methods=['GET'])
 def feed():
-
+    return render_template("feed.html")
 
 
 app.secret_key = 'some key that you will never guess'
