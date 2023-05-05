@@ -1474,6 +1474,11 @@ def fan_of_artist():
     else:
         return redirect(url_for('fetchList'))
 
+@login_required
+@app.route("/feed", methods=['GET'])
+def feed():
+
+
 
 app.secret_key = 'some key that you will never guess'
 # Run the app on localhost port 5000
