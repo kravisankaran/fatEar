@@ -8,6 +8,15 @@
 - Libraries: Bootstrap, jQuery
 - Project management tool: Git
 
+## Getting Started
+
+- PyMySql, Flask should be installed.
+- The MySQL connection variable is in init1.py file.
+
+```commandline
+flask --app init1 run
+```
+
 ## Post page (/post)
 
 ### Features:
