@@ -664,7 +664,7 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
             return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, avg(rat.stars) as stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join  artist a where gen.genre like %s group by s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre", (
             genre)
         else:
-            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join songGenre gen natural join  artist a where gen.genre like %s", (
+            return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, s.songURL, gen.genre from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join songGenre gen natural join artist a where gen.genre like %s", (
             genre)
     else:
         print('nothing was picked')
@@ -1103,7 +1103,7 @@ def followUser():
 
                 # check if user already follows the other user
                 if len(followStatus) > 0:
-                    message = "You are already follow %s." % (username_following)
+                    message = "You are already following %s." % (username_following)
                 else:
                     cursor = conn.cursor()
                     query = "INSERT INTO follows VALUES (%s, %s, %s)"
