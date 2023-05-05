@@ -45,10 +45,20 @@
                     at {{ action.action_date }}
                 </p>
                 <p class="card-text">
-                    - Artist: {{ action.fname }} {{ action.lname }}<br>
-                    - Song: {{ action.title }}<br>
-                    - Album: {{ action.albumName }}<br>
-                    - Genre: {{ action.genre }}<br>
+                    {% if action.fname != None %}
+                        - Artist: {{ action.fname }} {{ action.lname }}<br>
+                    {% endif %}
+                    {% if action.title != None %}
+                        - Song: {{ action.title }}<br>
+                    {% endif %}
+                    {% if action.albumName != None and action.action_type == 'reviewAlbum' or action.action_type == 'rateAlbum' %}
+                        - Album: {{ action.albumName }}<br>
+                    {% endif %}
+                    {% if action.genre != None %}
+                        - Genre: {{ action.genre }}<br>
+                    {% endif %}
+
+
                     {% if action.action_type == 'reviewSong' %}
                         - Song Review: {{ action.review }}<br>
                     {% endif %}
