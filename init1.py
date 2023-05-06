@@ -977,11 +977,12 @@ def friend():
     return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
-@app.route("/friendUser", methods=["POST"])
+@app.route("/friendUser", methods=["POST", "GET"])
 @login_required
 def friendUser():
     request_data = fetchFriendRequests()
     allf_data = fetchFriends()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1057,10 +1058,11 @@ def decline(username):
     return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
-@app.route("/unfriend", methods=["POST"])
+@app.route("/unfriend", methods=["POST", "GET"])
 def unfriend():
     request_data = fetchFriendRequests()
     allf_data = fetchFriends()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1129,11 +1131,12 @@ def follow():
     return render_template("follow.html", allFollowing=allf_data, allFollower=followersData)
 
 
-@app.route("/followUser", methods=["POST"])
+@app.route("/followUser",  methods=["POST", "GET"])
 @login_required
 def followUser():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1171,10 +1174,11 @@ def followUser():
     return render_template("follow.html", allFollowing=allf_data, allFollower=followersData, message=message)
 
 
-@app.route("/unfollow", methods=["POST"])
+@app.route("/unfollow",  methods=["POST", "GET"])
 def unfollow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1215,11 +1219,12 @@ def unfollow():
                            allFollowing=allf_data, allFollower=followersData)
 
 
-@app.route("/removeFollow", methods=["POST"])
+@app.route("/removeFollow",  methods=["POST", "GET"])
 def removeFollow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
-
+    message = ' '
+    
     if request.form:
         requestData = request.form
         to_remove = requestData["to_remove"]
