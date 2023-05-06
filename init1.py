@@ -141,30 +141,18 @@ def register():
 # Authenticates the login
 @app.route('/loginAuth', methods=['GET', 'POST'])
 def loginAuth():
-    # grabs information from the forms
     username = request.form['username']
     plaintextPasword = request.form['password']
-
-    ## need to change varchar limit in order for this to work
     hashedPassword = hashlib.sha256(plaintextPasword.encode("utf-8")).hexdigest()
 
-    lastlogin = time.strftime('%Y-%m-%d %H:%M:%S')
-
-    # cursor used to send queries
     cursor = conn.cursor()
-    # executes query
     query = 'SELECT * FROM user WHERE username = %s and pwd = %s'
     cursor.execute(query, (username, hashedPassword))
-    # stores the results in a variable
     data = cursor.fetchone()
-    # use fetchall() if you are expecting more than 1 data row
+
     error = None
     if (data):
-        # creates a session for the the user
-        # session is a built in
         session['username'] = username
-        update = 'UPDATE user SET lastlogin = %s WHERE username = %s'
-        cursor.execute(update, (lastlogin, username))
         conn.commit()
         cursor.close()
         return redirect(url_for('home'))
@@ -177,24 +165,18 @@ def loginAuth():
 # Authenticates the register
 @app.route('/registerAuth', methods=['GET', 'POST'])
 def registerAuth():
-    # grabs information from the forms
     username = request.form['username']
     plaintextPasword = request.form['password']
-
-    ## need to change varchar limit in order for this to work
     hashedPassword = hashlib.sha256(plaintextPasword.encode("utf-8")).hexdigest()
     fname = request.form['First Name']
     lname = request.form['Last Name']
     nickname = request.form['nickname']
 
-    # cursor used to send queries
     cursor = conn.cursor()
-    # executes query
     query = 'SELECT * FROM user WHERE username = %s'
     cursor.execute(query, (username))
-    # stores the results in a variable
     data = cursor.fetchone()
-    # use fetchall() if you are expecting more than 1 data row
+
     error = None
     if (data):
         # If the previous query returns data, then user exists
@@ -210,17 +192,24 @@ def registerAuth():
 
 @app.route('/logout')
 def logout():
+    lastlogin = time.strftime('%Y-%m-%d %H:%M:%S')
+
+    cursor = conn.cursor()
+    username = session['username']
+    update = 'UPDATE user SET lastlogin = %s WHERE username = %s'
+    cursor.execute(update, (lastlogin, username))
+    conn.commit()
+    cursor.close()
+
     session.pop('username')
     return redirect('/')
 
 
 @app.route('/home')
+@login_required
 def home():
     user = session['username']
     cursor = conn.cursor()
-    # query = 'SELECT ts, blog_post FROM blog WHERE username = %s ORDER BY ts DESC'
-    # cursor.execute(query, (user))
-    # data = cursor.fetchall()
     cursor.close()
     return render_template('home.html', username=user)
 
@@ -979,11 +968,12 @@ def friend():
     return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
-@app.route("/friendUser", methods=["POST"])
+@app.route("/friendUser", methods=["POST", "GET"])
 @login_required
 def friendUser():
     request_data = fetchFriendRequests()
     allf_data = fetchFriends()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1059,10 +1049,11 @@ def decline(username):
     return render_template("friend.html", friendRequests=request_data, allFriends=allf_data)
 
 
-@app.route("/unfriend", methods=["POST"])
+@app.route("/unfriend", methods=["POST", "GET"])
 def unfriend():
     request_data = fetchFriendRequests()
     allf_data = fetchFriends()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1131,11 +1122,12 @@ def follow():
     return render_template("follow.html", allFollowing=allf_data, allFollower=followersData)
 
 
-@app.route("/followUser", methods=["POST"])
+@app.route("/followUser",  methods=["POST", "GET"])
 @login_required
 def followUser():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1173,10 +1165,11 @@ def followUser():
     return render_template("follow.html", allFollowing=allf_data, allFollower=followersData, message=message)
 
 
-@app.route("/unfollow", methods=["POST"])
+@app.route("/unfollow",  methods=["POST", "GET"])
 def unfollow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1217,10 +1210,11 @@ def unfollow():
                            allFollowing=allf_data, allFollower=followersData)
 
 
-@app.route("/removeFollow", methods=["POST"])
+@app.route("/removeFollow",  methods=["POST", "GET"])
 def removeFollow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
+    message = ' '
 
     if request.form:
         requestData = request.form
@@ -1859,7 +1853,7 @@ def feed():
             UNION ALL
             SELECT username, 'reviewSong' as action_type, reviewDate as action_date, NULL as rating, reviewText as review, NULL as albumID, songID
             FROM reviewSong
-        ) action_table ON action_table.username = d.username AND action_table.action_date <= %s
+        ) action_table ON action_table.username = d.username AND action_table.action_date >= %s
         LEFT JOIN song s ON s.songID = action_table.songID
         LEFT JOIN artistPerformsSong aPS ON aPS.songID = s.songID
         LEFT JOIN artist a ON a.artistID = aPS.artistID
@@ -1891,7 +1885,7 @@ def feed():
         ORDER BY s.releaseDate DESC;
        '''
 
-    cursor.execute(query2, (user_id,))
+    cursor.execute(query2, (user_id))
     new_songs = cursor.fetchall()
 
     # Indications
