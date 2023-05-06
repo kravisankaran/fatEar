@@ -44,6 +44,26 @@ flask --app init1 run
 1. If no search parameters are specified
 2. If nothing matches the search parameters
 
+## Show Playlist page (/showplaylist)
+
+### Features:
+
+1. Users can see all the playlists they have created since the beginning
+
+## Add Playlist page (/playlist)
+
+### Features:
+
+1. Users can create a new playlist using this page
+2. They can add a playlist name, choose songs from the database and add a description for their playlist
+3. Songs they add for a new playlist shall be displayed in the bottom of the screen once its inserted
+
+### Error Handling
+
+1. User can make only one playlist with the same name
+2. User must choose at least one song
+3. User must have a playlist name
+
 ## Post page (/post)
 
 ### Features:
@@ -69,3 +89,5 @@ flask --app init1 run
    logged-in.
 2. Users can see new songs by artists that they are fan of. (new songs: since the user became a fan of)
 3. Users can see the total number of new feed item since they last logged-in.
+
+### Error Handling:
