@@ -3,9 +3,9 @@
 Implementation of fatEar application for CS-6083
 
 ## Authors
-Claudia Shao
-Hansaem Park
-Kumud Ravisankaran 
+- Claudia Shao
+- Hansaem Park
+- Kumud Ravisankaran 
 
 ## Built With
 
