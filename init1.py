@@ -1853,7 +1853,7 @@ def feed():
             UNION ALL
             SELECT username, 'reviewSong' as action_type, reviewDate as action_date, NULL as rating, reviewText as review, NULL as albumID, songID
             FROM reviewSong
-        ) action_table ON action_table.username = d.username AND action_table.action_date <= %s
+        ) action_table ON action_table.username = d.username AND action_table.action_date >= %s
         LEFT JOIN song s ON s.songID = action_table.songID
         LEFT JOIN artistPerformsSong aPS ON aPS.songID = s.songID
         LEFT JOIN artist a ON a.artistID = aPS.artistID
@@ -1885,7 +1885,7 @@ def feed():
         ORDER BY s.releaseDate DESC;
        '''
 
-    cursor.execute(query2, (user_id,))
+    cursor.execute(query2, (user_id))
     new_songs = cursor.fetchall()
 
     # Indications
