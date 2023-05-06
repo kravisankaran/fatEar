@@ -702,8 +702,18 @@ def checkIfRatingExistsWithSong(song):
         print(getSongIDFromRateSong(songID))
         return 0
     else:
-        print(getSongIDFromRateSong(songID))
-        return 1
+        set1 = songID
+        print("set1: ", set1)
+        set2 = getSongIDFromRateSong(songID)
+        l2 = [d['songID'] for d in set2]
+        print("set2: ", set2)
+        diff = set(set1) ^ set(l2)
+        if (len(diff) != 0):
+            print("Songs without rating", diff)
+            return 0
+        else:
+            print("All songs have a rating")
+            return 1
 
 
 def checkIfRatingExistsWithAlbum(album):
