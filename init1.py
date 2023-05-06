@@ -141,30 +141,18 @@ def register():
 # Authenticates the login
 @app.route('/loginAuth', methods=['GET', 'POST'])
 def loginAuth():
-    # grabs information from the forms
     username = request.form['username']
     plaintextPasword = request.form['password']
-
-    ## need to change varchar limit in order for this to work
     hashedPassword = hashlib.sha256(plaintextPasword.encode("utf-8")).hexdigest()
 
-    lastlogin = time.strftime('%Y-%m-%d %H:%M:%S')
-
-    # cursor used to send queries
     cursor = conn.cursor()
-    # executes query
     query = 'SELECT * FROM user WHERE username = %s and pwd = %s'
     cursor.execute(query, (username, hashedPassword))
-    # stores the results in a variable
     data = cursor.fetchone()
-    # use fetchall() if you are expecting more than 1 data row
+
     error = None
     if (data):
-        # creates a session for the the user
-        # session is a built in
         session['username'] = username
-        update = 'UPDATE user SET lastlogin = %s WHERE username = %s'
-        cursor.execute(update, (lastlogin, username))
         conn.commit()
         cursor.close()
         return redirect(url_for('home'))
@@ -177,24 +165,18 @@ def loginAuth():
 # Authenticates the register
 @app.route('/registerAuth', methods=['GET', 'POST'])
 def registerAuth():
-    # grabs information from the forms
     username = request.form['username']
     plaintextPasword = request.form['password']
-
-    ## need to change varchar limit in order for this to work
     hashedPassword = hashlib.sha256(plaintextPasword.encode("utf-8")).hexdigest()
     fname = request.form['First Name']
     lname = request.form['Last Name']
     nickname = request.form['nickname']
 
-    # cursor used to send queries
     cursor = conn.cursor()
-    # executes query
     query = 'SELECT * FROM user WHERE username = %s'
     cursor.execute(query, (username))
-    # stores the results in a variable
     data = cursor.fetchone()
-    # use fetchall() if you are expecting more than 1 data row
+
     error = None
     if (data):
         # If the previous query returns data, then user exists
@@ -210,6 +192,15 @@ def registerAuth():
 
 @app.route('/logout')
 def logout():
+    lastlogin = time.strftime('%Y-%m-%d %H:%M:%S')
+
+    cursor = conn.cursor()
+    username = session['username']
+    update = 'UPDATE user SET lastlogin = %s WHERE username = %s'
+    cursor.execute(update, (lastlogin, username))
+    conn.commit()
+    cursor.close()
+
     session.pop('username')
     return redirect('/')
 
@@ -1224,7 +1215,7 @@ def removeFollow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
     message = ' '
-    
+
     if request.form:
         requestData = request.form
         to_remove = requestData["to_remove"]
