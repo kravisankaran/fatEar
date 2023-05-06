@@ -87,7 +87,7 @@ flask --app init1 run
 
 1. Users can see reviews or ratings on song/album posted by friends, followers or friend & follower since they last
    logged-in.
-2. Users can see new songs by artists that they are fan of. (new songs: since the user became a fan of)
+2. Users can see new songs by artists that they are fan of. (new songs: since the user last logged-in)
 3. Users can see the total number of new feed item since they last logged-in.
 
 ### Error Handling:
