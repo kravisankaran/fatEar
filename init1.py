@@ -307,7 +307,8 @@ def getUpdatedSearchQuery(x, song, fname, lname, album, ratingVal, genre):
 
     elif x['s'] and x['f'] and x['r'] and x['g']:
         print('song, fname, rating, genre present')
-        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and rat.stars >= %s and gen.genre like %s", (song, fname, ratingVal, genre)
+        return "select s.title, a.fname, a.lname, s.releaseDate, alb.albumName, rat.stars, s.songURL, gen.genre  from song s natural join artistPerformsSong asp natural join songInAlbum sap natural join album alb NATURAL join rateSong rat natural join songGenre gen natural join artist a where title like %s and a.fname like %s and rat.stars >= %s and gen.genre like %s", (
+            song, fname, ratingVal, genre)
 
     elif x['s'] and x['l'] and x['a'] and x['r']:
         print('song, lname,  album, rating present')
@@ -1132,7 +1133,7 @@ def follow():
     return render_template("follow.html", allFollowing=allf_data, allFollower=followersData)
 
 
-@app.route("/followUser",  methods=["POST", "GET"])
+@app.route("/followUser", methods=["POST", "GET"])
 @login_required
 def followUser():
     allf_data = fetchFollowing()
@@ -1175,7 +1176,7 @@ def followUser():
     return render_template("follow.html", allFollowing=allf_data, allFollower=followersData, message=message)
 
 
-@app.route("/unfollow",  methods=["POST", "GET"])
+@app.route("/unfollow", methods=["POST", "GET"])
 def unfollow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
@@ -1220,7 +1221,7 @@ def unfollow():
                            allFollowing=allf_data, allFollower=followersData)
 
 
-@app.route("/removeFollow",  methods=["POST", "GET"])
+@app.route("/removeFollow", methods=["POST", "GET"])
 def removeFollow():
     allf_data = fetchFollowing()
     followersData = fetchFollower()
@@ -1600,7 +1601,7 @@ def rate_album():
     album_id = request.form['album_id']
     rating = int(request.form['rating'])
     user_id = session['username']
-    # rate_date = datetime.now()
+    rate_date = datetime.now()
 
     # Check if the input field is empty
     if rating == 0:
@@ -1615,10 +1616,10 @@ def rate_album():
         return redirect(url_for('fetchList', error_duplicate_album_rating=album_id))
 
     # Save rating in the database
-    # save_query = "INSERT INTO rateAlbum (albumID, username, stars, ratingDate) VALUES (%s, %s, %s, %s);"
-    # cursor.execute(save_query, (album_id, user_id, rating, rate_date))
-    save_query = "INSERT INTO rateAlbum (albumID, username, stars) VALUES (%s, %s, %s);"
-    cursor.execute(save_query, (album_id, user_id, rating))
+    save_query = "INSERT INTO rateAlbum (albumID, username, stars, ratingDate) VALUES (%s, %s, %s, %s);"
+    cursor.execute(save_query, (album_id, user_id, rating, rate_date))
+    # save_query = "INSERT INTO rateAlbum (albumID, username, stars) VALUES (%s, %s, %s);"
+    # cursor.execute(save_query, (album_id, user_id, rating))
     conn.commit()
     cursor.close()
 
@@ -1632,6 +1633,7 @@ def update_rate_album():
     album_id = request.form['album_id']
     rating = int(request.form['rating'])
     user_id = session['username']
+    rate_date = datetime.now()
 
     # Check if the input field is empty
     if rating == 0:
@@ -1647,8 +1649,8 @@ def update_rate_album():
         return redirect(url_for('fetchList', error_no_existing_rating=album_id))
 
     # Update rating in the database
-    update_query = "UPDATE rateAlbum SET stars = %s WHERE albumID = %s AND username = %s;"
-    cursor.execute(update_query, (rating, album_id, user_id))
+    update_query = "UPDATE rateAlbum SET stars = %s, ratingDate = %s WHERE albumID = %s AND username = %s;"
+    cursor.execute(update_query, (rating, rate_date, album_id, user_id))
     conn.commit()
     cursor.close()
 
@@ -1717,6 +1719,7 @@ def update_rate_song():
     song_id = request.form['song_id']
     rating = int(request.form['rating'])
     user_id = session['username']
+    rate_date = datetime.now()
 
     # Check if the input field is empty
     if rating == 0:
@@ -1732,8 +1735,8 @@ def update_rate_song():
         return redirect(url_for('fetchList', error_no_existing_rating=song_id))
 
     # Update rating in the database
-    update_query = "UPDATE rateSong SET stars = %s WHERE songID = %s AND username = %s;"
-    cursor.execute(update_query, (rating, song_id, user_id))
+    update_query = "UPDATE rateSong SET stars = %s, ratingDate = %s WHERE songID = %s AND username = %s;"
+    cursor.execute(update_query, (rating, rate_date, song_id, user_id))
     conn.commit()
     cursor.close()
 
@@ -1818,10 +1821,7 @@ def feed():
         return "User not found", 404
 
     last_login = result['lastlogin']
-    fan_date_query = "SELECT fanAt FROM userFanOfArtist WHERE username = %s"
-    cursor.execute(fan_date_query, (user_id,))
-    # fanSince = cursor.fetchone()['fanAt']
-
+    print(last_login)
     # Fetch new reviews and ratings by friends or followers since the last login
     query1 = '''
         SELECT 
@@ -1889,13 +1889,13 @@ def feed():
         JOIN album al ON al.albumID = sIA.albumID
         JOIN songGenre sg ON sg.songID = s.songID
         JOIN (
-            SELECT artistID, fanAt FROM userFanOfArtist WHERE username = %s
+            SELECT artistID FROM userFanOfArtist WHERE username = %s
         ) uf ON uf.artistID = a.artistID
-        WHERE CAST(s.releaseDate AS DATETIME) >= CAST(uf.fanAt AS DATETIME)
+        WHERE s.releaseDate >= %s
         ORDER BY s.releaseDate DESC;
        '''
 
-    cursor.execute(query2, (user_id))
+    cursor.execute(query2, (user_id, last_login))
     new_songs = cursor.fetchall()
 
     # Indications
@@ -1914,14 +1914,6 @@ def feed():
     cursor.execute(friend_follower_query, (user_id, user_id, user_id))
     friend_follower_count = cursor.fetchone()['count']
 
-    cursor.execute(query2, (user_id,))
-    new_songs = cursor.fetchall()
-
-    has_friends_or_followers = friend_follower_count > 0
-    has_fan_artists = bool(new_songs)
-    no_new_feed = has_friends_or_followers and not friend_actions
-    no_new_songs = has_fan_artists and not new_songs
-
     # Artists
     fan_artist_query = '''
         SELECT COUNT(*) AS count
@@ -1930,9 +1922,6 @@ def feed():
     '''
     cursor.execute(fan_artist_query, (user_id,))
     fan_artist_count = cursor.fetchone()['count']
-
-    cursor.execute(query2, (user_id,))
-    new_songs = cursor.fetchall()
 
     is_fan_of_artists = fan_artist_count > 0
     has_friends_or_followers = friend_follower_count > 0
