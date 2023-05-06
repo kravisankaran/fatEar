@@ -91,3 +91,10 @@ flask --app init1 run
 3. Users can see the total number of new feed item since they last logged-in.
 
 ### Error Handling:
+
+1. Users can see indication if they have no followers nor friends.
+2. Users can see indication if they have followers or friends but they haven't updated any posts(reviews/ratings on
+   songs/albums).
+3. Users can see indication if they are not fan of any artists.
+4. Users can see indication if they are a fan of some artists but they haven't released any new songs yet since the user
+   became a fan of them.

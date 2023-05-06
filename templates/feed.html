@@ -22,6 +22,12 @@
     <h2 class="my-4">Feed</h2>
     <p>You have {{ friend_actions|length + new_songs|length }} new feed items since your last login.</p>
     <h3 class="my-3">New reviews and ratings by friends or followers:</h3>
+    {% if not has_friends_or_followers %}
+        <p class="error text-danger">You should follow or friend with someone to activate your feed.</p>
+    {% endif %}
+    {% if has_friends_or_followers and no_new_feed %}
+        <p class="error text-danger">No new posts so far.</p>
+    {% endif %}
     {% for action in friend_actions %}
         <div class="card mb-3">
             <div class="card-body">
@@ -65,10 +71,10 @@
                     {% if action.action_type == 'rateSong' %}
                         - Song Rating:
                         <span>
-            {% for i in range(action.rating | to_int) %}
-                <span class="star">&starf;</span>
-            {% endfor %}
-          </span>
+                            {% for i in range(action.rating | to_int) %}
+                                <span class="star">&starf;</span>
+                            {% endfor %}
+                          </span>
                         <br>
                     {% endif %}
                     {% if action.action_type == 'reviewAlbum' %}
@@ -91,6 +97,13 @@
 
     <br/>
     <h3 class="my-3">New songs by artists you're a fan of:</h3>
+    {% if not is_fan_of_artists %}
+        <p class="error text-danger">You should become a fan of some artists to activate your feed.</p>
+    {% endif %}
+
+    {% if is_fan_of_artists and no_new_songs %}
+        <p class="error text-danger">No new songs so far.</p>
+    {% endif %}
     {% for song in new_songs %}
         <div class="card mb-3">
             <div class="card-body">
