@@ -63,7 +63,7 @@ flask --app init1 run
 2. They can add a playlist name, choose songs from the database and add a description for their playlist
 3. Songs they add for a new playlist shall be displayed in the bottom of the screen once its inserted
 
-### Error Handling
+### Error Handling:
 
 1. User can make only one playlist with the same name
 2. User must choose at least one song
@@ -113,7 +113,7 @@ flask --app init1 run
 3. User can input their username and password to log into FatEar
 4. lastlogin time is perserved as a milestone during a logged-in session and updated when user logs out
 
-### Error Handling
+### Error Handling:
 
 1. Multiple users cannot register with the same username, error message will be displayed.
 2. Users cannot leave any field blank on the registration page, error message will be displayed.
@@ -128,7 +128,7 @@ flask --app init1 run
 3. Users can unfriend another user
 4. Users can see friend requests sent to them, and decide whether to accept or decline
 
-### Error Handling
+### Error Handling:
 
 1. Users cannot friend/unfriend themselves, error message will be displayed.
 2. Users cannot friend another user that is already their friend, or send friend requests twice, error message will be displayed.
@@ -143,7 +143,7 @@ flask --app init1 run
 2. Users can see a list of followers they currently have, and a list of users they are following
 3. Users can unfollow another user, or remove a follower
 
-### Error Handling
+### Error Handling:
 
 1. Users cannot follow/unfollow themselves, error message will be displayed.
 2. Users cannot follow another user they are already following, error message will be displayed.
