@@ -44,7 +44,7 @@ flask --app init1 run
 4. If a song has been rated more than once - an average rating will be returned in the results
 5. Search results will contain rating information only if ratings are present for songs matching the parameters
 
-### Error Handling
+### Error Handling:
 
 1. If no search parameters are specified
 2. If nothing matches the search parameters
