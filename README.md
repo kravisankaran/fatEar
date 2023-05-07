@@ -103,3 +103,53 @@ flask --app init1 run
 3. Users can see indication if they are not fan of any artists.
 4. Users can see indication if they are a fan of some artists but they haven't released any new songs yet since the user
    became a fan of them.
+
+## Register/Login
+
+### Features:
+
+1. Users can create an account by filling in Username, password(hashed before inserting into the database for more security), first/last name, and nickname
+2. Once the account has been created, the user will be redirected to the login page
+3. User can input their username and password to log into FatEar
+4. lastlogin time is perserved as a milestone during a logged-in session and updated when user logs out
+
+### Error Handling
+
+1. Multiple users cannot register with the same username, error message will be displayed.
+2. Users cannot leave any field blank on the registration page, error message will be displayed.
+3. Users cannot leave any field blank on the login page, error message will be displayed.
+
+## Friend
+
+### Features:
+
+1. Users can send friend request to another user
+2. Users can see a list of friends they currently have
+3. Users can unfriend another user
+4. Users can see friend requests sent to them, and decide whether to accept or decline
+
+### Error Handling
+
+1. Users cannot friend/unfriend themselves, error message will be displayed.
+2. Users cannot friend another user that is already their friend, or send friend requests twice, error message will be displayed.
+3. Users cannot remove a user who is not their friend, error message will be displayed.
+4. Users cannot friend a username that doesn't exist, error message will be displayed.
+
+## Follow
+
+### Features:
+
+1. Users can follow another user
+2. Users can see a list of followers they currently have, and a list of users they are following
+3. Users can unfollow another user, or remove a follower
+
+### Error Handling
+
+1. Users cannot follow/unfollow themselves, error message will be displayed.
+2. Users cannot follow another user they are already following, error message will be displayed.
+3. Users cannot remove a follower who is not their follower, error message will be displayed.
+4. Users cannot unfollow a user who they are not following, error message will be displayed.
+5. Users cannot follow/unfollow a username that doesn't exist, error message will be displayed.
+
+
+
